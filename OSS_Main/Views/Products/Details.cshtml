@@ -1,0 +1,258 @@
+﻿@model OSS_Main.Models.Entity.Product
+
+@{
+    ViewData["Title"] = "Details";
+    var product = ViewBag.ProductDetail as OSS_Main.Models.Entity.Product ?? new OSS_Main.Models.Entity.Product();
+    var price = ViewBag.Price as OSS_Main.Models.Entity.ProductSpec ?? new OSS_Main.Models.Entity.ProductSpec();
+    var allCategories = ViewBag.Categories as List<OSS_Main.Models.Entity.Category> ?? new List<OSS_Main.Models.Entity.Category>();
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<!-- Single Product Start -->
+<div class="container-fluid py-5 mt-5">
+    <div class="container py-5">
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8 col-xl-9">
+                <div class="row g-4">
+
+                    <div class="col-lg-6">
+                        <div class="border rounded">
+
+                            <!-- Carousel cho ảnh con -->
+                            <div id="productImageCarousel" class="carousel slide mt-3" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    @foreach (var image in product.ProductImages)
+                                    {
+                                        <div class="carousel-item @((image == product.ProductImages.FirstOrDefault()) ? "active" : "")">
+                                            <img src="@image.ImageUrl" class="d-block w-100" alt="Thumbnail">
+                                        </div>
+                                    }
+                                </div>
+                                <!-- Previous và Next Buttons -->
+                                <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <h4 class="fw-bold mb-3">@product.ProductName</h4>
+                        <p class="mb-3">
+                            Category:
+                            @foreach (var cat in @product.ProductCategories)
+                            {
+                                @cat.Category.Name
+                            }
+                        </p>
+
+
+                        <p class="fs-5 fw-bold mb-0" style="color: red; font-weight: bold;">
+                            @string.Format("{0:N0}", price.SalePrice) VND
+                        </p>
+                        <p class="text-dark fs-5 fw-bold mb-0" style="color: gray; text-decoration: line-through;">
+                            @string.Format("{0:N0}", price.BasePrice) VND
+                        </p>
+
+
+                        <p class="mb-4">@product.Description</p>
+
+
+                        @foreach (var spec in @product.ProductSpecs)
+                        {
+                            var isActive = spec.ProductSpecId == ViewBag.SelectedSpecId;
+
+                            <a href="@Url.Action("Details", "Products", new { productId = product.ProductId, specId = spec.ProductSpecId })"
+                               class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"
+                               style="@(isActive ? "background-color: #ffbb00; color: white; border-color: #007bff;" : "")">
+                                <i class="fa me-2 text-primary"></i> @spec.SpecName
+                            </a>
+                        }
+
+
+                        <br>
+                        <!--Add to card-->
+                        @* <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary active"><i class="fa fa-shopping-bag me-2 text-primary active"></i> Add to cart</a>*@
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                           <form method="post" asp-controller="Cart" asp-action="AddToCart">
+                               <input type="hidden" name="productSpecId" value="@price.ProductSpecId" />
+                               <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm text-center border-0" style="width: 60px;" />
+                               <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
+                                   <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                               </button>
+                           </form>
+                        }
+                        else
+                        {
+                            <a asp-area="Identity" asp-page="/Account/Login" class="btn border border-secondary rounded-pill px-3 text-danger">
+                                <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
+                            </a>
+                        }
+                        
+
+
+                    </div>
+
+                    <!--Review feedback và mô tả-->
+                    <div class="col-lg-12">
+                        <nav>
+                            <div class="nav nav-tabs mb-3">
+                                <button class="nav-link active border-white border-bottom-0" type="button" role="tab"
+                                        id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
+                                        aria-controls="nav-about" aria-selected="true">
+                                    Description
+                                </button>
+                                <button class="nav-link border-white border-bottom-0" type="button" role="tab"
+                                        id="nav-mission-tab" data-bs-toggle="tab" data-bs-target="#nav-mission"
+                                        aria-controls="nav-mission" aria-selected="false">
+                                    Reviews
+                                </button>
+                            </div>
+                        </nav>
+
+                        <div class="tab-content mb-5">
+                            <!--Mô tả-->
+                            <div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+                                <p>
+                                    The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic words etc.
+                                    Susp endisse ultricies nisi vel quam suscipit
+                                </p>
+                                <p>
+                                    Sabertooth peacock flounder; chain pickerel hatchetfish, pencilfish snailfish filefish Antarctic
+                                    icefish goldeye aholehole trumpetfish pilot fish airbreathing catfish, electric ray sweeper.
+                                </p>
+                            </div>
+
+                            <!--Reveiew-->
+                            <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+                                <div class="d-flex">
+                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
+                                    <div class="">
+                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
+                                        <div class="d-flex justify-content-between">
+                                            <h5>Jason Smith</h5>
+                                            <div class="d-flex mb-3">
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic
+                                            words etc. Susp endisse ultricies nisi vel quam suscipit
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="d-flex">
+                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
+                                    <div class="">
+                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
+                                        <div class="d-flex justify-content-between">
+                                            <h5>Sam Peters</h5>
+                                            <div class="d-flex mb-3">
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star"></i>
+                                                <i class="fa fa-star"></i>
+                                            </div>
+                                        </div>
+                                        <p class="text-dark">
+                                            The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic
+                                            words etc. Susp endisse ultricies nisi vel quam suscipit
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-4 col-xl-3">
+                <div class="row g-4 fruite">
+                    <div class="col-lg-12">
+
+                        <div class="mb-4">
+                            <h4>Categories</h4>
+                            <ul class="list-unstyled fruite-categorie">
+                                @foreach (var category in allCategories)
+                                {
+                                    <!--Category-->
+                                    <li>
+                                        <div class="d-flex justify-content-between fruite-name">
+                                            <a href="@Url.Action("Index", "Products", new { categoryId = category.CategoryId })">
+                                                <i class="fas fa-apple-alt me-2 @(ViewBag.SelectedCategoryId == category.CategoryId ? "active" : "")"></i>@category.Name
+                                            </a>
+                                        </div>
+                                    </li>
+                                }
+
+
+
+                            </ul>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-12">
+                        <div class="position-relative">
+                            <img src="img/banner-fruits.jpg" class="img-fluid w-100 rounded" alt="">
+                            <div class="position-absolute" style="top: 50%; right: 10px; transform: translateY(-50%);">
+                                <h3 class="text-secondary fw-bold">Fresh <br> Fruits <br> Banner</h3>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+
+        <h1 class="fw-bold mb-0">Related products</h1>
+        <div class="vesitable">
+
+            <div class="owl-carousel vegetable-carousel justify-content-center">
+
+                <div class="border border-primary rounded position-relative vesitable-item">
+                    <div class="vesitable-img">
+                        <img src="img/vegetable-item-6.jpg" class="img-fluid w-100 rounded-top" alt="">
+                    </div>
+                    <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">Vegetable</div>
+                    <div class="p-4 pb-0 rounded-bottom">
+                        <h4>Parsely</h4>
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit sed do eiusmod te incididunt</p>
+                        <div class="d-flex justify-content-between flex-lg-wrap">
+                            <p class="text-dark fs-5 fw-bold">$4.99 / kg</p>
+                            <a href="#" class="btn border border-secondary rounded-pill px-3 py-1 mb-4 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Single Product End -->
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

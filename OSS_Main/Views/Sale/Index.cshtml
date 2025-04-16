@@ -1,0 +1,129 @@
+﻿@model IEnumerable<OSS_Main.Models.Entity.Order>
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Index";
+}
+
+<h1>Order Tracking</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderCode_GHN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentMethod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Notes)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.OrderStatusId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalCost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Receiver)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderCode_GHN)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentMethod)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @{
+                        string status = string.Empty;
+                        if (item.OrderStatusId == 1)
+                        {
+                            status = "Pending Confirmation";
+                        }
+                        else if (item.OrderStatusId == 2)
+                        {
+                            status = "Confirmed";
+                        }
+                        else
+                        {
+                            status = "Canceled";
+                        }
+                    }
+
+                    @Html.DisplayFor(modelItem => status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalCost)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Receiver.FullName)
+                </td>
+                <td>
+                    @if (item.OrderStatusId == 1)
+                    {
+                        <button class="btn btn-primary btn-sm"
+                                onclick="window.location.href='@Url.Action("ConfirmOrder", "Sale", new { orderId = item.OrderId })'">
+                            Confirm
+                        </button>
+                        <button class="btn btn-danger btn-sm"
+                                onclick="window.location.href='@Url.Action("CancelOrder", new { orderId = item.OrderId })'">
+                            Cancel Order
+                        </button>
+                    }
+                    else if (item.OrderStatusId == 2)
+                    {
+                        <button class="btn btn-success btn-sm"
+                                onclick="window.location.href='@Url.Action("PrintOrder", "Sale", new { orderCode_GHN = item.OrderCode_GHN })'">
+                            Print Order
+                        </button>
+                        if (item.OrderCode_GHN != null)
+                        {
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="window.location.href='@Url.Action("CancelOrderGHN", "Sale", new { orderId = item.OrderId, orderId_GHN = item.OrderCode_GHN })'">
+                                Cancel Order
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="window.location.href='@Url.Action("CancelOrderAfterConfirm", new { orderId = item.OrderId })'">
+                                Cancel Order
+                            </button>
+                        }
+
+                    }
+                    else
+                    {
+                        <div class="text-danger font-weight-bold">
+                            The order is canceled.
+                        </div>
+                    }
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/hub.js"></script>

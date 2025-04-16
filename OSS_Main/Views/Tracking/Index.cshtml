@@ -1,0 +1,186 @@
+﻿@using OSS_Main.Models.Entity
+@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "Shipment Tracking";
+}
+
+<!-- Page Header -->
+<h1>@ViewData["Title"]</h1>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        <h4 class="alert-heading">Bạn chưa có đơn hàng nào</h4>
+        <p>Hãy mua sắm nào bro.</p>
+        <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary rounded-pill px-4 py-2 mt-2 ms-4">
+            <i class="fa fa-plus me-2"></i> Thêm sản phẩm
+        </a>
+    </div>
+}
+else
+{
+    <!-- Shipments Table -->
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Image</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Name</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Spec</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">TotalPrice</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Order Date</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Order Status</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">To</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Note</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Payment Method</th>
+                <th style="padding: 8px; text-align: left; background-color: #f4f4f4;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                foreach (var orderItem in order.OrderItemOrders)
+                {
+
+
+                    <tr>
+                        <td style="padding: 8px;">
+                            @if (orderItem.CartItem.ProductSpec.Product.ProductImages.Any())
+                            {
+                                <a href="@Url.Action("OrderDetail", "Tracking", new { orderId = order.OrderId })" style="text-decoration: none; color: inherit;">
+
+                                    <img src="@orderItem.CartItem.ProductSpec.Product.ProductImages.FirstOrDefault()?.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                                </a>
+
+                            }
+                            else
+                            {
+                                <span>No Image</span>
+                            }
+                        </td>
+
+                        <!-- Name Column -->
+                        <td style="padding: 8px;">@orderItem.CartItem.ProductSpec.Product.ProductName</td>
+
+                        <!-- Spec Column -->
+                        <td style="padding: 8px;">@orderItem.CartItem.ProductSpec.SpecName</td>
+
+                        <!-- Total Price Column -->
+                        <td style="padding: 8px;">@string.Format("{0:N0}", @order.TotalCost) VND</td>
+
+                        <!-- Order Date Column -->
+                        <td style="padding: 8px;">@order.OrderAt.ToString("dd/MM/yyyy")</td>
+
+                        <!-- Order Status Column -->
+                        <td style="padding: 8px;">
+                            @if (order.OrderStatusId == 1)
+                            {
+                                <span class="badge bg-success">Pending confirmation</span>
+                            }
+                            else if (order.OrderStatusId == 2)
+                            {
+                                <span class="badge bg-info">Ready to Ship</span>
+                            }
+                            else if (order.OrderStatusId == 3)
+                            {
+                                <span class="badge bg-danger">Cancel</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Exception</span>
+                            }
+                        </td>
+
+                        <!-- To Column (Receiver Name) -->
+                        <td style="padding: 8px;">
+                            @order.Receiver?.FullName
+                        </td>
+
+                        <!-- Note Column -->
+                        <td style="padding: 8px;">
+                            @(string.IsNullOrEmpty(order.Notes) ? "No Note" : order.Notes)
+                        </td>
+
+                        <td style="padding: 8px;">
+                            @order.PaymentMethod
+                        </td>
+
+                        <!-- Action Column -->
+                        <td style="padding: 8px;">
+                            @if (order.OrderStatusId == 1 && order.PaymentMethod.Equals("COD"))
+                            {
+                                <form method="post" asp-action="CancelOrder" asp-controller="Order" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <button style="padding: 12px 24px; background-color: #d9291c; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#45a049'" onmouseout="this.style.backgroundColor='#d9291c'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Cancel
+                                    </button>
+                                </form>
+                            }
+                            else if (order.OrderStatusId == 1 && order.PaymentMethod.Equals("PayOS"))
+                            {
+                                <form method="post" asp-action="ProcessPaymentAgain" asp-controller="Payment" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="PayOS" name="paymentMethod" value="PayOS">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="receiverInforId" name="receiverInforId" value="@order.ReceiverId">
+                                    <button type="submit" style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#c78100'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Pay again
+                                    </button>
+                                </form>
+
+                                <form method="post" asp-action="ProcessPaymentAgain" asp-controller="Payment" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="vnPay" name="paymentMethod" value="vnPay">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="receiverInforId" name="receiverInforId" value="@order.ReceiverId">
+                                    <button type="submit" style="padding: 12px 24px; background-color: #007BFF; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#0056b3'" onmouseout="this.style.backgroundColor='#007BFF'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Pay by vnPay
+                                    </button>
+                                </form>
+                            }
+                            else if (order.OrderStatusId == 1 && order.PaymentMethod.Equals("vnPay"))
+                            {
+                                <form method="post" asp-action="ProcessPaymentAgain" asp-controller="Payment" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="vnPay" name="paymentMethod" value="vnPay">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="receiverInforId" name="receiverInforId" value="@order.ReceiverId">
+                                    <button type="submit" style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#138496'" onmouseout="this.style.backgroundColor='#c78100'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Pay again
+                                    </button>
+                                </form>
+
+                                <form method="post" asp-action="ProcessPaymentAgain" asp-controller="Payment" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="PayOS" name="paymentMethod" value="PayOS">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="receiverInforId" name="receiverInforId" value="@order.ReceiverId">
+                                    <button type="submit" style="padding: 12px 24px; background-color: #17A2B8; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#138496'" onmouseout="this.style.backgroundColor='#17A2B8'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Pay by QR
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button style="padding: 12px 24px; background-color: #1f9c06; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                        onmouseover="this.style.backgroundColor='#c82333'" onmouseout="this.style.backgroundColor='#1f9c06'"
+                                        onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                    Contact Support
+                                </button>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/hub.js"></script>

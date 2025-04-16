@@ -1,0 +1,533 @@
+﻿@using OSS_Main.Models.Entity
+@model IEnumerable<ProductSpec>
+
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Product List";
+}
+
+<main class="page-content bg-light">
+    <div class="top-header">
+        <div class="header-bar d-flex justify-content-between border-bottom">
+            <div class="d-flex align-items-center">
+                <a href="#" class="logo-icon">
+                    <img src="@Url.Content("~/assets/images/logo-icon.png")" height="30" class="small" alt="Logo">
+                    <span class="big">
+                        <img src="@Url.Content("~/assets/images/logo-dark.png")" height="24" class="logo-light-mode" alt="Logo">
+                        <img src="@Url.Content("~/assets/images/logo-light.png")" height="24" class="logo-dark-mode" alt="Logo">
+                    </span>
+                </a>
+                <a id="close-sidebar" class="btn btn-icon btn-pills btn-soft-primary ms-2" href="#">
+                    <i class="uil uil-bars"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="layout-specing">
+            <div class="d-md-flex justify-content-between">
+                <h5 class="mb-0">Product List</h5>
+                <nav aria-label="breadcrumb" class="d-inline-block mt-4 mt-sm-0">
+                    <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="@Url.Content("~/index.html")">Admin</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Product List</li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Add Product Button -->
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="uil uil-plus-circle"></i> Add Product
+                </button>
+            </div>
+
+            <!-- Add Product Modal -->
+            <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addProductForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label">Product Name</label>
+                                    <input type="text" name="ProductName" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="Description" class="form-control" required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Product Spec Name</label>
+                                    <input type="text" name="SpecName" class="form-control" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Base Price</label>
+                                    <input type="number" name="BasePrice" class="form-control" required min="1000" max="1000000000">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Sale Price</label>
+                                    <input type="number" name="SalePrice" class="form-control" required min="1000" max="1000000000">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" name="Quantity" class="form-control" required min="0">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select name="CategoryId" class="form-control">
+                                        <option value="">Select Category</option>
+                                        @foreach (var category in ViewBag.Categories)
+                                        {
+                                            <option value="@category.CategoryId">@category.Name</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Upload Images</label>
+                                    <input type="file" name="ProductImages" class="form-control" multiple required>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Product</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Product Modal -->
+            <div class="modal fade" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewProductModalLabel">View Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            @* <span asp-validation-for="product.ProductName" class="text-danger"></span> *@
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Product Name:</label>
+                                <p id="viewProductName"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description:</label>
+                                <p id="viewProductDescription"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Price:</label>
+                                <p id="viewProductPrice"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sale Price:</label>
+                                <p id="viewProductSalePrice"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Quantity:</label>
+                                <p id="viewProductQuantity"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Category:</label>
+                                <p id="viewProductCategory"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status:</label>
+                                <p id="viewProductStatus"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Images:</label>
+                                <div id="viewProductImages"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editProductForm" enctype="multipart/form-data">
+                                <input type="hidden" name="ProductSpecId" id="editProductId">
+                                <div class="mb-3">
+                                    <label class="form-label">Product Name</label>
+                                    <input type="text" name="SpecName" id="editProductName" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="Description" id="editProductDescription" class="form-control" readonly></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Price</label>
+                                    <input type="number" name="BasePrice" id="editProductPrice" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sale Price</label>
+                                    <input type="number" name="SalePrice" id="editProductSalePrice" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" name="Quantity" id="editProductQuantity" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select name="CategoryId" id="editProductCategory" class="form-control">
+                                        <option value="">Select Category</option>
+                                        @foreach (var category in ViewBag.Categories)
+                                        {
+                                            <option value="@category.CategoryId">@category.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Product Status</label>
+
+                                    <div class="form-group">
+                                        <label for="isPublished">Is Published</label>
+                                        <input type="checkbox" name="IsPublished" id="editIsPublished" class="form-check-input" />
+                                    </div>
+
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Upload New Images</label>
+                                    <input type="file" name="ProductImages" id="editProductImages" class="form-control" multiple>
+                                    <div id="existingImages" class="mt-2"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Update Product</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="row">
+                <div class="col-12 mt-4">
+                    <div class="table-responsive shadow rounded">
+                        <table class="table table-centered bg-white mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="border-bottom p-3">Id</th>
+                                    <th class="border-bottom p-3">Image</th>
+                                    <th class="border-bottom p-3">Product Name</th>
+                                    <th class="border-bottom p-3">Quantity</th>
+                                    <th class="border-bottom p-3">Price</th>
+                                    <th class="border-bottom p-3">Sale Price</th>
+                                    <th class="border-bottom p-3">Status</th>
+                                    <th class="border-bottom p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model)
+                                {
+                                    <tr>
+                                        <th class="p-3">@product.ProductSpecId</th>
+
+                                        <td class="p-3">
+                                            @if (product.Product.ProductImages != null && product.Product.ProductImages.Any())
+                                            {
+                                                <img src="@product.Product.ProductImages.FirstOrDefault()?.ImageUrl" alt="Product Image" width="80" height="80" class="img-thumbnail" />
+                                            }
+                                            else
+                                            {
+                                                <span>No Image</span>
+                                            }
+                                        </td>
+
+                                        <td class="p-3">@product.Product.ProductName - (@product.SpecName)</td>
+                                        <td class="p-3">@product.Quantity</td>
+                                        <td class="p-3">@string.Format("{0:N0}", product.BasePrice) VND</td>
+                                        <td class="p-3">@string.Format("{0:N0}", product.SalePrice) VND</td>
+
+                                        <td class="p-3 status-cell">
+                                            <span class="badge @(product.ProductStatus ? "bg-success" : "bg-danger")">
+                                                @(product.ProductStatus ? "Published" : "Not Published")
+                                            </span>
+                                        </td>
+
+
+                                        <td class="p-3 text-end">
+                                            <button class="btn btn-icon btn-pills btn-soft-primary view-product" data-id="@product.ProductSpecId" data-bs-toggle="modal" data-bs-target="#viewProductModal">
+                                                <i class="uil uil-eye"></i>
+                                            </button>
+                                            <button class="btn btn-icon btn-pills btn-soft-success edit-product" data-id="@product.ProductSpecId" data-bs-toggle="modal" data-bs-target="#editProductModal">
+                                                <i class="uil uil-pen"></i>
+                                            </button>
+
+                                            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                                            {
+                                                <button class="btn btn-icon btn-pills btn-soft-danger delete-product" data-id="@product.ProductSpecId">
+                                                    <i class="uil uil-trash"></i>
+                                                </button>
+                                            }
+                                         
+                                        
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row text-center">
+                <div class="col-12 mt-4">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ProductList", "AdminProduct", new { page = ViewBag.CurrentPage - 1 })">Prev</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ProductList", "AdminProduct", new { page = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ProductList", "AdminProduct", new { page = ViewBag.CurrentPage + 1 })">Next</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+             $(document).ready(function () {
+        $(document).on("click", ".view-product", function () {
+            var productId = $(this).data("id");
+            console.log("View Product Clicked! ID:", productId);
+
+            $.ajax({
+                url: '@Url.Action("GetProduct", "AdminProduct")',
+                type: 'GET',
+                data: { id: productId },
+                success: function (response) {
+                    console.log("AJAX Response:", response);
+                    if (response.success && response.product) {
+                        $("#viewProductName").text(response.product.productName || "N/A");
+                        $("#viewProductDescription").text(response.product.description || "N/A");
+                        $("#viewProductPrice").text(response.product.basePrice || "N/A");
+                        $("#viewProductSalePrice").text(response.product.salePrice || "N/A");
+                        $("#viewProductQuantity").text(response.product.quantity || "N/A");
+                        $("#viewProductCategory").text(response.product.name || "N/A");
+                        $("#viewProductStatus").html(response.product.productStatus ? "✅" : "❌");
+
+                        var imageContainer = $("#viewProductImages");
+                        imageContainer.empty();
+                        if (response.product.productImages && response.product.productImages.length > 0) {
+                            response.product.productImages.forEach(function (imgUrl) {
+                                imageContainer.append(`<img src="${imgUrl}" class="img-thumbnail me-2" width="100">`);
+                            });
+                        } else {
+                            imageContainer.append("<p>No images available</p>");
+                        }
+
+                        $('#viewProductModal').modal('show');
+                    } else {
+                        alert("Product not found.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("AJAX Error:", xhr.responseText);
+                }
+            });
+        });
+
+        $(document).on("click", ".edit-product", function () {
+            var productId = $(this).data("id");
+            console.log("Edit Product Clicked! ID:", productId);
+
+            $.ajax({
+                url: '@Url.Action("GetProduct", "AdminProduct")',
+                type: 'GET',
+                data: { id: productId },
+                success: function (response) {
+                    console.log("Edit Product Data:", response.product);
+                    if (response.success && response.product) {
+                        var product = response.product;
+                        $("#editProductId").val(product.productSpecId);
+                        $("#editProductName").val(product.productName);
+                        $("#editProductDescription").val(product.description);
+                        $("#editProductPrice").val(product.basePrice);
+                        $("#editProductSalePrice").val(product.salePrice);
+                        $("#editProductQuantity").val(product.quantity);
+                        $("#editProductCategory").val(product.categoryId);
+                        $("#editIsPublished").prop("checked", product.productStatus);
+
+                        var existingImagesContainer = $("#existingImages");
+                        existingImagesContainer.empty();
+                        if (product.productImages && product.productImages.length > 0) {
+                            product.productImages.forEach(function (imgUrl) {
+                                existingImagesContainer.append(`<img src="${imgUrl}" class="img-thumbnail me-2" width="100">`);
+                            });
+                        } else {
+                            existingImagesContainer.append("<p>No images available</p>");
+                        }
+
+                        $('#editProductModal').modal('show');
+                    } else {
+                        alert("Product not found.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("AJAX Error:", xhr.responseText);
+                }
+            });
+        });
+
+        $("#editProductForm").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            formData.append("ProductStatus", $("#editIsPublished").is(":checked"));
+            console.log("Form: ", formData);
+            $.ajax({
+                url: '@Url.Action("UpdateProduct", "AdminProduct")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    console.log("Dataa: ", response);
+                    if (response.success) {
+                        $('#editProductModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert("Failed to update product.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error("AJAX Error:", xhr.responseText);
+                }
+            });
+        });
+               $(".delete-product").click(function () {
+        var productId = $(this).data("id");
+
+        if (confirm("Are you sure you want to delete this product?")) {
+            $.ajax({
+                url: '@Url.Action("DeleteProduct", "AdminProduct")',
+                type: 'POST',
+                data: { id: productId },
+                success: function (response) {
+                    if (response.success) {
+                        alert("Product and associated images deleted successfully.");
+                        location.reload();  // Reload the page to reflect changes
+                    } else {
+                        alert(response.message || "Failed to delete product.");
+                    }
+                },
+                error: function () {
+                    alert("Error deleting product.");
+                }
+            });
+        }
+    });
+
+
+
+        $(".change-status").click(function () {
+            var button = $(this);
+            var productId = button.data("id");
+            var statusId = button.data("status");
+
+            $.ajax({
+                url: '@Url.Action("ChangeProductStatus", "AdminProduct")',
+                type: 'POST',
+                data: { productId: productId, statusId: statusId },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+
+       $("#addProductForm").submit(function(e) {
+        e.preventDefault();
+
+        // Lấy các giá trị từ form
+        var basePrice = parseFloat($("input[name='BasePrice']").val());
+        var salePrice = parseFloat($("input[name='SalePrice']").val());
+        var quantity = parseInt($("input[name='Quantity']").val());
+
+        // Kiểm tra Base Price (phải là số dương, lớn hơn 1000 và nhỏ hơn 1 tỷ)
+        if (basePrice <= 1000 || basePrice >= 1000000000) {
+            alert("Base Price must be between 1000 and 1000000000.");
+            return;
+        }
+
+        // Kiểm tra Sale Price (phải là số và nhỏ hơn Base Price)
+        if (isNaN(salePrice) || salePrice <= 0 || salePrice >= basePrice) {
+            alert("Sale Price must be a positive number less than Base Price.");
+            return;
+        }
+
+        // Kiểm tra Quantity (phải là số và >= 0)
+        if (isNaN(quantity) || quantity < 0) {
+            alert("Quantity must be a positive number greater than or equal to 0.");
+            return;
+        }
+
+        // Nếu tất cả các kiểm tra hợp lệ, gửi form
+        var formData = new FormData(this);
+        $.ajax({
+            url: '@Url.Action("AddProduct", "AdminProduct")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                if (response.success) {
+                    $('#addProductModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert("Add Product failed.");
+                }
+            },
+            error: function() {
+                alert("An error occurred while adding the product.");
+            }
+        });
+    });
+             });
+
+
+</script>
+<style>
+    .text-danger {
+        color: red;
+        font-size: 0.875em;
+        margin-top: 5px;
+    }
+</style>

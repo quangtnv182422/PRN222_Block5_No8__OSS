@@ -1,0 +1,596 @@
+﻿@using OSS_Main.Models.Entity
+@model List<OSS_Main.Models.Entity.CartItem>
+@{
+    ViewData["Title"] = "Order";
+}
+
+
+<button type="button" class="btn btn-primary" id="addAddressBtn">Add New Address</button>
+<!-- Change Address Button -->
+
+<button type="button" class="btn btn-primary" id="changeAddressBtn">Change Address</button>
+
+@if (!(ViewBag.HasAddress ?? false)) 
+{
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">Giỏ hàng của bạn chưa có địa chỉ!</h4>
+        <p>Vui lòng thêm một địa chỉ mới để tiếp tục thanh toán.</p>
+    </div>
+}
+
+<!-- Pop-up modal -->
+<div id="addAddressModal" class="modal fade" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addressForm">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">Phone Number</label>
+                        <input type="text" class="form-control" id="phoneNumber" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="province" class="form-label">Province</label>
+                        <select class="form-control" id="province" required>
+                            <option value="">-- Select Province --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="district" class="form-label">District</label>
+                        <select class="form-control" id="district" required>
+                            <option value="">-- Select District --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ward" class="form-label">Ward</label>
+                        <select class="form-control" id="ward" required>
+                            <option value="">-- Select Ward --</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address" required>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="makeDefault">
+                        <label class="form-check-label" for="makeDefault">Make Default</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAddressBtn">Save Address</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal to Change Address -->
+<div id="changeAddressModal" class="modal fade" tabindex="-1" aria-labelledby="changeAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeAddressModalLabel">Change Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Address list for user to change -->
+                <ul id="addressList"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAddressChangesBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Checkout Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-4">Billing details</h1>
+        <form method="post" asp-action="ProcessPayment" asp-controller="Payment" class="billing-address-form">
+            <div class="row g-5">
+                <div class="col-md-12 col-lg-6 col-xl-7">
+
+
+                    <!-- Full Name -->
+                    <div class="form-item">
+                        <label class="form-label my-3">Full Name <sup>*</sup></label>
+                        <input type="text" class="form-control" readonly value="@ViewBag.FullName" required>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-item">
+                        <label class="form-label my-3">Address <sup>*</sup></label>
+                        <input type="text" class="form-control" readonly value="@ViewBag.Address" required>
+
+                        <input type="hidden" class="form-control" id="wardId_GHN" readonly value="@ViewBag.WardId_GHN">
+                        <input type="hidden" class="form-control" id="districtId_GHN" readonly value="@ViewBag.DistrictId_GHN">
+                        <input type="hidden" class="form-control" id="provinceId_GHN" readonly value="@ViewBag.ProvinceId_GHN">
+                    </div>
+
+                    <!-- Mobile -->
+                    <div class="form-item">
+                        <label class="form-label my-3">Mobile <sup>*</sup></label>
+                        <input type="tel" class="form-control" readonly value="@ViewBag.PhoneNumber" required>
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="form-item">
+                        <label class="form-label my-3">Email Address <sup>*</sup></label>
+                        <input type="email" class="form-control" readonly value="@ViewBag.Email" required>
+                    </div>
+
+                    <div class="form-item">
+                        <textarea id="deliveryNotes" name="deliveryNotes" class="form-control" spellcheck="false" cols="30" rows="11" placeholder="Oreder Notes (Optional)"></textarea>
+                    </div>
+                </div>
+
+                <!-- FORM BAO QUANH CẢ DELIVERY DETAILS VÀ ORDER SUMMARY -->
+
+                <div class="col-md-12 col-lg-6 col-xl-5">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Products</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <!--Product-->
+                                    <tr>
+                                        <th scope="row">
+                                            <div class="d-flex align-items-center mt-2">
+                                                <img src="@((item.ProductSpec.Product.ProductImages != null && item.ProductSpec.Product.ProductImages.Any()) ? item.ProductSpec.Product.ProductImages.FirstOrDefault()?.ImageUrl : "/assets/img/default-product.jpg")"
+                                                     class="img-fluid rounded-circle" style="width: 90px; height: 90px;" alt="">
+                                            </div>
+                                        </th>
+                                        <td class="py-5">@item.ProductSpec.Product.ProductName ~ (@item.ProductSpec.SpecName)</td>
+                                        <td class="py-5">@string.Format("{0:N0}", @item.PriceEachItem) VND</td>
+                                        <td class="py-5">@item.Quantity</td>
+                                        <td class="py-5">@string.Format("{0:N0}", @item.PriceEachItem * item.Quantity) VND</td>
+                                    </tr>
+                                }
+                                <!--Tổng giá-->
+                                <tr>
+                                    <th scope="row">
+                                    </th>
+                                    <td class="py-5"></td>
+                                    <td class="py-5"></td>
+                                    <td class="py-5">
+                                        <p class="mb-0 text-dark py-3">Subtotal</p>
+                                    </td>
+                                    <td class="py-5">
+                                        <div class="py-3 border-bottom border-top">
+                                            <p class="mb-0 text-dark">@string.Format("{0:N0}", ViewBag.TotalAmount) VND</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!--Phí ship-->
+                                <tr>
+                                    <th scope="row">
+                                    </th>
+                                    <td class="py-5">
+                                        <p class="mb-0 text-dark py-4">Shipping Fee:</p>
+                                    </td>
+                                    <td colspan="3" class="py-5">
+                                        <div class="form-check text-start">
+                                            <label class="form-check-label" for="Shipping-2" id="shipping-fee">Fee: </label>
+                                        </div>
+                                    </td>
+                                </tr>
+
+
+                                <!--Tổng tiền sau khi đã cộng ship-->
+                                <tr>
+                                    <th scope="row">
+                                    </th>
+                                    <td class="py-5">
+                                        <p class="mb-0 text-dark text-uppercase py-3">TOTAL</p>
+                                    </td>
+                                    <td class="py-5"></td>
+                                    <td class="py-5"></td>
+                                    <td class="py-5">
+                                        <div class="py-3 border-bottom border-top">
+                                            <p class="mb-0 text-dark" id="total-fee">$135.00</p>
+                                        </div>
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <input type="hidden" name="receiverInforId" value="@ViewBag.ReceiverID" />
+                    <input type="hidden" id="total-amount" name="totalCost" value="" />
+                    <input type="hidden" name="selectedItems" value="@string.Join(",", Model.Select(x => x.CartItemId))" />
+
+                    <!--COD-->
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                        <div class="col-12">
+                            <div class="form-check text-start my-3">
+                                <input type="radio" class="form-check-input bg-primary border-0" id="COD" name="paymentMethod" value="COD" checked>
+                                <label class="form-check-label" for="COD">COD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--vnPay-->
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                        <div class="col-12">
+                            <div class="form-check text-start my-3">
+                                <input type="radio" class="form-check-input bg-primary border-0" id="vnPay" name="paymentMethod" value="vnPay">
+                                <label class="form-check-label" for="vnPay">vnPay</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--PayOS-->
+                    <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                        <div class="col-12">
+                            <div class="form-check text-start my-3">
+                                <input type="radio" class="form-check-input bg-primary border-0" id="PayOS" name="paymentMethod" value="PayOS">
+                                <label class="form-check-label" for="PayOS">QR Code</label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!--Place Order button-->
+                    <div class="row g-4 text-center align-items-center justify-content-center pt-4">
+                        <button type="submit" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary">Place Order</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Checkout Page End -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+         const hasAddresses = @((ViewBag.HasAddresses ?? false).ToString().ToLower());
+
+        if (!hasAddresses) {
+            // Show "Add New Address" button and open modal
+            const addAddressBtn = document.getElementById('addAddressBtn');
+            const addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+
+            addAddressBtn.addEventListener('click', function () {
+                addAddressModal.show();
+            });
+        }
+
+        // Lấy modal và nút "Add New Address"
+        const addAddressBtn = document.getElementById('addAddressBtn');
+        const addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+
+        // Hiển thị modal khi nút "Add New Address" được nhấn
+        addAddressBtn.addEventListener('click', function () {
+            addAddressModal.show();
+        });
+
+        // Tải tỉnh thành khi trang được load
+        loadProvinces();
+
+        // Xử lý sự kiện thay đổi tỉnh thành
+        document.getElementById('province').addEventListener('change', function () {
+            const provinceId = this.value;
+            loadDistricts(provinceId);
+        });
+
+        // Xử lý sự kiện thay đổi quận huyện
+        document.getElementById('district').addEventListener('change', function () {
+            const districtId = this.value;
+            loadWards(districtId);
+        });
+
+        // Tải danh sách tỉnh thành
+        function loadProvinces() {
+            fetch("/Order/GetProvinces")
+                .then(response => response.json())
+                .then(data => {
+                    const provinces = data.data;
+                    const provinceSelect = document.getElementById('province');
+                    provinceSelect.innerHTML = '<option value="">-- Select Province --</option>';
+                    provinces.forEach(province => {
+                        provinceSelect.innerHTML += `<option value="${province.ProvinceID}" data-name="${province.ProvinceName}">${province.ProvinceName}</option>`;
+                    });
+                });
+        }
+
+        // Tải danh sách quận huyện theo tỉnh thành
+        function loadDistricts(provinceId) {
+            fetch(`/Order/GetDistricts?provinceId=${provinceId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const districts = data.data;
+                    const districtSelect = document.getElementById('district');
+                    districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+                    districts.forEach(district => {
+                        districtSelect.innerHTML += `<option value="${district.DistrictID}" data-name="${district.DistrictName}">${district.DistrictName}</option>`;
+                    });
+                });
+        }
+
+        // Tải danh sách xã phường theo quận huyện
+        function loadWards(districtId) {
+            fetch(`/Order/GetWards?districtId=${districtId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const wards = data.data;
+                    const wardSelect = document.getElementById('ward');
+                    wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
+                    wards.forEach(ward => {
+                        wardSelect.innerHTML += `<option value="${ward.WardCode}" data-name="${ward.WardName}">${ward.WardName}</option>`;
+                    });
+                });
+        }
+
+        // Lưu địa chỉ
+        document.getElementById('saveAddressBtn').addEventListener('click', function () {
+            const provinceSelect = document.getElementById('province');
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
+
+            // Lấy tên tỉnh, quận, và xã/phường
+            const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+            const districtName = districtSelect.options[districtSelect.selectedIndex].dataset.name;
+            const wardName = wardSelect.options[wardSelect.selectedIndex].dataset.name;
+
+            const addressData = {
+                FullName: document.getElementById('fullName').value,
+                PhoneNumber: document.getElementById('phoneNumber').value,
+                Email: document.getElementById('email').value,
+                Address: document.getElementById('address').value,
+                ProvinceId_GHN: provinceSelect.value,
+                DistrictId_GHN: districtSelect.value,
+                WardId_GHN: wardSelect.value,
+                ProvinceName_GHN: provinceName,
+                DistrictName_GHN: districtName,
+                WardName_GHN: wardName,
+                IsDefault: document.getElementById('makeDefault').checked
+            };
+            console.log("Infor: ", addressData);
+
+            fetch('/Order/AddReceiverInformation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(addressData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Address saved successfully!");
+                        addAddressModal.hide();  // Đóng modal sau khi lưu
+                        location.reload();  // Reload page hoặc bạn có thể chỉ cập nhật UI mà không reload
+                    } else {
+                        alert("Failed to save address.");
+                    }
+                })
+                .catch(error => {
+                    alert("Error saving address: " + error);
+                });
+        });
+
+
+
+        function getAvailableServices() {
+            const fromDistrictId = 1452;  // Example from district ID, this could be dynamic
+            const toDistrictId = document.getElementById('districtId_GHN').value;  // Get to district ID from the select
+            const shopId = 196195;  // Shop ID, replace with your actual shop ID
+
+            console.log("fromDistrictId:", fromDistrictId, "toDistrictId:", toDistrictId);
+
+            fetch('/Order/GetAvailableServices', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ shopId: shopId, fromDistrictId: fromDistrictId, toDistrictId: toDistrictId })
+            })
+                .then(response => {
+                    // Kiểm tra xem phản hồi có phải là JSON hợp lệ không
+                    if (!response.ok) {
+                        throw new Error('Server error: ' + response.status);
+                    }
+                    return response.text();  // Lấy dữ liệu dưới dạng văn bản (text)
+                })
+                .then(text => {
+                    try {
+                        // Chuyển đổi văn bản thành JSON
+                        const data = JSON.parse(text);
+                        if (data.code === 200 && data.data && data.data.length > 0) {
+                            const serviceId = data.data[0].service_id;
+                            const serviceTypeId = 2;  // Example, replace if needed
+                            calculateShipping(serviceId, serviceTypeId);
+                        } else {
+                            alert("No shipping services available.");
+                        }
+                    } catch (error) {
+                        // Nếu không thể chuyển đổi thành JSON, in ra lỗi
+                        console.error("Error parsing JSON:", error);
+                        alert("Invalid JSON response from server.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching available services:", error);
+                    alert("Vui lòng nhập địa chỉ nhận hàng mới!!!.");
+                });
+        }
+
+
+        // Call the API to calculate shipping fee
+        function calculateShipping(serviceId, serviceTypeId) {
+            const fromDistrictId = 1452;  // Example from district ID
+            const toDistrictId = document.getElementById('districtId_GHN').value;  // Get to district ID from the select
+            const weight = 500;  // Example weight, replace with actual data
+            const length = 20;  // Example length
+            const width = 20;   // Example width
+            const height = 10;  // Example height
+            const shopId = 196195;  // Shop ID, replace with your actual shop ID
+
+            fetch('/Order/CalculateShipping', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    shopId: shopId,
+                    fromDistrictId: fromDistrictId,
+                    toDistrictId: toDistrictId,
+                    weight: weight,
+                    length: length,
+                    width: width,
+                    height: height,
+                    service_id: serviceId,
+                    service_type_id: serviceTypeId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200 && data.data) {
+                        const fee = data.data.total;
+                        // Update the shipping fee in the table
+                        document.getElementById("shipping-fee").innerText = fee.toLocaleString() + " VND";
+
+                        const subtotal = parseFloat('@ViewBag.TotalAmount'); // Get subtotal from ViewBag
+                         const totalAmount = subtotal + fee;  // Add shipping fee to subtotal
+
+                        // Update the total value in the table
+                        document.getElementById("total-fee").innerText = totalAmount.toLocaleString() + " VND";
+                        document.getElementById("total-amount").value = totalAmount.toLocaleString();
+
+                    } else {
+                        alert("Unable to calculate shipping fee.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error calculating shipping:", error);
+                    alert("Failed to calculate shipping fee.");
+                });
+        }
+
+        // Call the services API when the page is loaded
+        getAvailableServices();
+
+        // Trigger on district change (optional)
+        document.getElementById('districtId_GHN').addEventListener('change', function () {
+            getAvailableServices();  // Recalculate the services and shipping fee when the district changes
+        });
+    });
+
+    //--------------------------------------------------------------------------------------------//
+    //--------------------------------------------------------------------------------------------//
+    //--------------------------------------------------------------------------------------------//
+    document.addEventListener("DOMContentLoaded", function () {
+        const changeAddressBtn = document.getElementById('changeAddressBtn');
+        const changeAddressModal = new bootstrap.Modal(document.getElementById('changeAddressModal'));
+
+        // Show modal when "Change Address" is clicked
+        changeAddressBtn.addEventListener('click', function () {
+            // Fetch all receiver addresses for the user
+            fetch('/Order/GetReceiverInformation')
+                .then(response => response.json())
+                .then(data => {
+                    const addressList = document.getElementById('addressList');
+                    addressList.innerHTML = ''; // Clear previous content
+
+                    data.forEach(address => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                        <input type="radio" name="address" value="${address.receiverId}" ${address.isDefault ? 'checked' : ''}>
+                        ${address.fullName} - ${address.address}
+                    `;
+                        addressList.appendChild(li);
+                    });
+                });
+            changeAddressModal.show();
+        });
+
+        // Handle saving the new default address when "Save Changes" is clicked
+        document.getElementById('saveAddressChangesBtn').addEventListener('click', function () {
+            const selectedAddressId = document.querySelector('input[name="address"]:checked')?.value;
+
+            if (selectedAddressId) {
+                console.log('Selected Address ID:', selectedAddressId);
+
+                // Get the current list of addresses and update IsDefault
+                fetch('/Order/GetReceiverInformation')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Receiver Information:', data);
+                        // Set IsDefault based on the selected address
+                        data.forEach(address => {
+                            address.isDefault = (address.receiverId.toString() === selectedAddressId); // Set selected address as default
+                        });
+
+                        // Send updated address data to the server
+                        fetch('/Order/UpdateReceiverInformation', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log('Server Response:', result);
+                                if (result.success) {
+                                    alert('Address updated successfully');
+                                    changeAddressModal.hide();  // Close modal
+                                    location.reload(); // Reload the page to reflect changes
+                                } else {
+                                    alert('Failed to update address.');
+                                }
+                            })
+                            .catch(error => alert('Error updating address: ' + error));
+                    });
+            } else {
+                alert('Please select an address.');
+            }
+        });
+
+
+
+        const checkoutButton = document.querySelector('button[type="submit"]'); // Nút "Place Order"
+
+        checkoutButton.addEventListener('click', function (event) {
+            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+            if (!selectedPaymentMethod) {
+                // Nếu không có phương thức thanh toán nào được chọn
+                alert("Vui lòng chọn một phương thức thanh toán!");
+                event.preventDefault(); // Ngừng việc gửi form
+            }
+        });
+    });
+
+
+
+</script>
+

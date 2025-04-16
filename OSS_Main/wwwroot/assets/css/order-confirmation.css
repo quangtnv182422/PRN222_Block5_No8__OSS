@@ -1,0 +1,176 @@
+﻿/* Reduce margins for the section */
+.checkout-section {
+    margin-top: 50px !important;
+    margin-bottom: 50px !important;
+}
+
+/* Adjust table styling for full-width product list */
+.order-details table {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.order-details th, .order-details td {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.order-details img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+/* Add product button */
+.add-product-btn {
+    background-color: #f28123;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .add-product-btn:hover {
+        background-color: #e06b1f;
+    }
+
+/* Redesign form layout */
+.billing-address-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.billing-address-form input[type="text"],
+.billing-address-form input[type="email"],
+.billing-address-form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.billing-address-form .row {
+    margin-bottom: 15px;
+}
+
+.boxed-btn {
+    background-color: #f28123;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+}
+
+    .boxed-btn:hover {
+        background-color: #e06b1f;
+    }
+
+/* Remove extra space below */
+.checkout-section .container {
+    padding-bottom: 0;
+}
+
+/* Style the Order Summary section to fill the space */
+.order-details-wrap {
+    height: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    padding: 0; /* Remove padding to split sections */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Order Summary Section */
+.order-summary-section {
+    flex: 1; /* Takes 50% of the space */
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.order-details {
+    width: 100%;
+}
+
+    .order-details th, .order-details td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+.order-details-wrap thead th {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #e1e1e1;
+}
+
+.order-details-body td {
+    font-size: 14px;
+    color: #555;
+}
+
+.checkout-details td {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Ensure the right column matches the height of the left column */
+.col-lg-8, .col-lg-4 {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-details-wrap {
+    flex-grow: 1;
+}
+
+/* Full-width product list section */
+.full-width-section {
+    margin-bottom: 20px;
+}
+
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+/* Style the Payment Method section inside Order Summary */
+.payment-method-section {
+    flex: 1; /* Takes 50% of the space */
+    padding: 15px;
+    border-top: 1px solid #e1e1e1; /* Add a separator for visual distinction */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+}
+
+    .payment-method-section h4 {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+.payment-method label {
+    margin-right: 20px;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+}
+
+.payment-method input[type="radio"] {
+    margin-right: 5px;
+}

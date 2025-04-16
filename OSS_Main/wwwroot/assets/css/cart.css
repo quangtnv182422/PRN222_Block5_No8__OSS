@@ -1,0 +1,66 @@
+﻿/* Style for the breadcrumb section to reduce bottom margin */
+.breadcrumb-section {
+    margin-bottom: 30px !important;
+}
+
+/* Style for the table to adjust spacing */
+.cart-section {
+    margin-top: 50px !important;
+    margin-bottom: 50px !important;
+}
+
+/* Style for the product name cell to align delete icon */
+.product-cell {
+    position: relative;
+    padding-right: 40px;
+}
+
+/* Style for the delete button */
+.delete-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: red;
+}
+
+/* Ensure table cells have consistent padding */
+.table td, .table th {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+/* Adjust table width and center it */
+.table {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Style for total amount */
+.cart-total {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Style for order button */
+.order-button {
+    background-color: #f28123;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .order-button:hover {
+        background-color: #e06b1f;
+    }
+
+/* Empty cart message */
+.empty-cart-message {
+    text-align: center;
+    font-size: 18px;
+    margin: 50px 0;
+}

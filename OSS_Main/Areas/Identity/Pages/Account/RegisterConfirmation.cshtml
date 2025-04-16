@@ -1,0 +1,15 @@
+﻿@page
+@model OSS_Main.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Registration Confirmation";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-info">
+    <h4 class="alert-heading">Vui lòng xác nhận email của bạn!</h4>
+    <p>Chúng tôi đã gửi email xác nhận tới địa chỉ <strong>@Model.Email</strong>. Vui lòng kiểm tra hộp thư của bạn và xác nhận để kích hoạt tài khoản.</p>
+    <p>Nếu bạn không nhận được email, vui lòng kiểm tra thư mục spam hoặc yêu cầu gửi lại email xác nhận.</p>
+</div>
+
+<a href="/" class="btn btn-primary">Quay lại trang chủ</a>

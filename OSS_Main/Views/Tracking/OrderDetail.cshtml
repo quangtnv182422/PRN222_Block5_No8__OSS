@@ -1,0 +1,84 @@
+﻿@model OSS_Main.Models.Entity.Order 
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<!-- Page Header -->
+<h1 style="font-size: 24px; font-weight: bold; color: #333; text-align: center; margin-bottom: 20px;">@ViewData["Title"]</h1>
+
+<!-- Order Summary Section -->
+<div class="order-summary" style="display: flex; align-items: center; margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+    <!-- Text Information for first OrderItem (or any representative) -->
+    <div>
+        <p style="font-size: 16px; font-weight: bold; margin: 5px 0; color: #333;">Order Summary</p>
+    </div>
+</div>
+
+<hr style="border-top: 1px solid #ddd; margin: 20px 0;">
+
+<!-- Order Details -->
+<div class="order-details" style="font-size: 16px; color: #333; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
+    <h3>Order Items</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="padding: 8px; text-align: left;">Product Image</th>
+                <th style="padding: 8px; text-align: left;">Product Name</th>
+                <th style="padding: 8px; text-align: left;">Spec</th>
+                <th style="padding: 8px; text-align: left;">Price</th>
+                <th style="padding: 8px; text-align: left;">Quantity</th>
+                <th style="padding: 8px; text-align: left;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var orderItem in Model.OrderItemOrders)
+            {
+                <tr>
+                    <!-- Image Column -->
+                    <td style="padding: 8px;">
+                        @if (orderItem.CartItem.ProductSpec.Product.ProductImages.Any())
+                        {
+                            <img src="@orderItem.CartItem.ProductSpec.Product.ProductImages.FirstOrDefault()?.ImageUrl" alt="Product Image" style="width: 50px; height: 50px;" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </td>
+
+                    <!-- Name Column -->
+                    <td style="padding: 8px;">@orderItem.CartItem.ProductSpec.Product.ProductName</td>
+
+                    <!-- Spec Column -->
+                    <td style="padding: 8px;">@orderItem.CartItem.ProductSpec.SpecName</td>
+
+                    <!-- Price Column -->
+                    <td style="padding: 8px;">@string.Format("{0:N0}", orderItem.CartItem.PriceEachItem) VND</td>
+
+                    <!-- Quantity Column -->
+                    <td style="padding: 8px;">@orderItem.CartItem.Quantity</td>
+
+                    <!-- Total Column -->
+                    <td style="padding: 8px;">@string.Format("{0:N0}", orderItem.CartItem.PriceEachItem * orderItem.CartItem.Quantity) VND</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<hr style="border-top: 1px solid #ddd; margin: 20px 0;">
+
+<!-- Order Total Section -->
+<div class="order-details" style="font-size: 16px; color: #333; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
+   
+    <div class="row" style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold;">
+        <div class="col">TOTAL</div>
+        <div class="col text-right">@string.Format("{0:N0}", Model.TotalCost) VND</div>
+    </div>
+</div>
+
+<!-- Back to Orders Button -->
+<div style="margin-top: 20px;">
+    <a href="@Url.Action("Index", "Tracking")" class="btn btn-outline-primary rounded-pill px-4 py-2">Back to Orders</a>
+</div>

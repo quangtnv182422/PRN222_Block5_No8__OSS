@@ -1,0 +1,228 @@
+﻿@using OSS_Main.Models.Entity
+@model Cart
+@{
+    ViewData["Title"] = "Cart";
+
+}
+<a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary rounded-pill px-4 py-2 mt-2 ms-4">
+    <i class="fa fa-plus me-2"></i> Add More Products
+</a>
+
+
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        @if (Model.CartItems == null || !Model.CartItems.Any())
+        {
+            <div class="alert alert-info">
+                <h4 class="alert-heading">Giỏ hàng của bạn chưa có món hàng nào</h4>
+                <p>Vui lòng thêm sản phẩm vào giỏ hàng để tiếp tục.</p>
+                <a href="@Url.Action("Index", "Products")" class="btn btn-outline-primary rounded-pill px-4 py-2 mt-2 ms-4">
+                    <i class="fa fa-plus me-2"></i> Thêm sản phẩm
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Selected</th>
+                            <th scope="col">Products</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Handle</th>
+                        </tr>
+                    </thead>
+                    <!--List item cart-->
+
+                    <tbody>
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="item-checkbox" name="selectedItems" value="@item.CartItemId" data-price="@item.PriceEachItem" data-quantity="@item.Quantity" data-total="@item.PriceEachItem * @item.Quantity" onchange="updateSubtotal()" />
+                                </td>
+                                <!--Image-->
+                                <th scope="row">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@((item.ProductSpec.Product.ProductImages != null && item.ProductSpec.Product.ProductImages.Any()) ? item.ProductSpec.Product.ProductImages.FirstOrDefault()?.ImageUrl : "/assets/img/default-product.jpg")"
+                                             class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                                    </div>
+                                </th>
+                                <!--Name-->
+                                <td>
+                                    <p class="mb-0 mt-4">@item.ProductSpec.Product.ProductName  - (@item.ProductSpec.SpecName) </p>
+                                </td>
+                                <!--Price single-->
+                                <td>
+                                    <p class="mb-0 mt-4">  @string.Format("{0:N0}", @item.ProductSpec.SalePrice) VND</p>
+                                </td>
+
+                                <td>
+                                    <form id="updateQuantityForm_@item.CartItemId" method="post">
+                                        <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                        <div class="input-group quantity mt-4" style="width: 120px;">
+                                            <!-- BUTTON TRỪ -->
+                                            <button type="button" class="btn btn-sm rounded-circle bg-light border" onclick="updateQuantity(@item.CartItemId, '@(item.Quantity - 1)')">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+
+                                            <!-- INPUT CHỈ HIỂN THỊ -->
+                                            <input type="number" min="1" readonly class="form-control form-control-sm text-center border-0" value="@item.Quantity" id="quantity_@item.CartItemId" />
+
+                                            <!-- BUTTON CỘNG -->
+                                            <button type="button" class="btn btn-sm rounded-circle bg-light border" onclick="updateQuantity(@item.CartItemId, '@(item.Quantity + 1)')">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+
+
+
+                                </td>
+
+                                <!--Total of cart item-->
+                                <td>
+                                    @{
+                                        decimal total = Model.CartItems.Sum(item => item.PriceEachItem);
+                                    }
+
+                                    <p class="mb-0 mt-4">@string.Format("{0:N0}", @item.PriceEachItem * @item.Quantity) VND</p>
+                                </td>
+                                <td>
+                                    <form asp-controller="Cart" asp-action="RemoveItem" method="post" style="display:inline;">
+                                        <input type="hidden" name="cartItemId" value="@item.CartItemId" />
+                                        <button type="submit" class="btn btn-md rounded-circle bg-light border mt-4">
+                                            <i class="fa fa-times text-danger"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    <!--List item cart end-->
+                </table>
+            </div>
+
+            <!--Cart Total-->
+            <div class="row g-4 justify-content-end">
+                <div class="col-8"></div>
+                <div class="col-sm-8 col-md-7 col-lg-6 col-xl-4">
+                    <div class="bg-light rounded">
+
+                        <div class="p-4">
+                            <h1 class="display-6 mb-4">Cart <span class="fw-normal">Total</span></h1>
+
+                            <div class="d-flex justify-content-between mb-4">
+                                <h5 class="mb-0 me-4">Subtotal:</h5>
+                                <p class="mb-0" id="subtotal">0 VND</p>
+                            </div>
+
+                        </div>
+
+                        <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
+                            <h5 class="mb-0 ps-4 me-4">Total</h5>
+                            <p class="mb-0 pe-4">@string.Format("{0:N0}", Model.TotalPrice) VND</p>
+                        </div>
+                        <!--Checkout Button-->
+                        <button class="btn proceed-checkout border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="button">
+                            Proceed Checkout
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        }
+        <!--Cart Total-->
+    </div>
+</div>
+<!-- Cart Page End -->
+<script>
+    function updateQuantity(cartItemId, newQuantity) {
+        $('#quantity_' + cartItemId).val(newQuantity);
+
+        $.ajax({
+             url: '/Cart/UpdateQuantity',
+            type: 'POST',
+            data: {
+                cartItemId: cartItemId,
+                quantity: newQuantity
+            },
+            success: function (response) {
+                    if (response.success) {
+                     // alert('Cập nhật số lượng thành công!');
+                    location.reload();
+                      } else {
+                                                         alert('Cập nhật số lượng thất bại! Số lượng không đủ');
+                      }
+                                                },
+            error: function (xhr, status, error) {
+                                                    alert('Có lỗi xảy ra, vui lòng thử lại!');
+                                                }
+                                            });
+                                        }
+                                        function updateSubtotal() {
+                                            let subtotal = 0;
+
+                                            document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
+                                                if (checkbox.checked) {
+                                                        let price = parseFloat(checkbox.getAttribute('data-price'));
+                                                        let quantity = parseInt(checkbox.getAttribute('data-quantity'));
+                                                        let total = price * quantity;
+                                                        console.log("Giá: ", total);
+
+                                                        subtotal += total; // Cộng dồn giá trị của sản phẩm đã chọn
+                                                    }
+                                                    });
+
+                                                document.getElementById('subtotal').textContent = subtotal.toLocaleString() + ' VND';
+                                            }
+
+                                            function getCheckedItems() {
+                                                let selectedItems = [];
+
+                                                // Lặp qua tất cả checkbox và lấy giá trị của các checkbox được chọn
+                                                document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
+                                                    if (checkbox.checked) {
+                                                            selectedItems.push(checkbox.value); // Lưu CartItemId vào mảng
+                                                        }
+                                                        });
+
+                                                    // Gửi danh sách CartItemId đã chọn đến CartController
+                                                    if (selectedItems.length > 0) {
+                                                        // Gửi danh sách các CartItemId dưới dạng JSON chuỗi
+                                                        proceedCheckout(selectedItems);
+                                                    } else {
+                                                        alert("Vui lòng chọn ít nhất một sản phẩm!");
+                                                    }
+                                                }
+
+                                                // Hàm gửi dữ liệu đến CartController
+                                                function proceedCheckout(selectedItems) {
+                                                    // Tạo form mới để gửi dữ liệu tới CartController
+                                                    let form = document.createElement('form');
+                                                    form.method = 'GET';
+                                                    form.action = '@Url.Action("OrderConfirmation", "Order")';
+
+                                                    // Thêm dữ liệu selectedItems vào form
+                                                    let input = document.createElement('input');
+                                                    input.type = 'hidden';
+                                                    input.name = 'selectedItems'; // Tên tham số cần gửi
+                                                    input.value = JSON.stringify(selectedItems); // Chuyển mảng thành chuỗi JSON
+                                                    form.appendChild(input);
+
+                                                    // Thêm form vào body và submit
+                                                    document.body.appendChild(form);
+                                                    form.submit();
+                                                }
+
+                                                // Lắng nghe sự kiện khi nhấn nút "Proceed Checkout"
+                                                document.querySelector('.btn.proceed-checkout').addEventListener('click', getCheckedItems);
+
+
+</script>
