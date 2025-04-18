@@ -70,9 +70,15 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
-    options.SignIn.RequireConfirmedAccount = true;
+    //options.Password.RequiredLength = 6;
+    //options.Password.RequireNonAlphanumeric = false;
+    //options.SignIn.RequireConfirmedAccount = true;
+
+    options.Password.RequireDigit = false;                // Không yêu cầu mật khẩu phải chứa số
+    options.Password.RequireLowercase = false;            // Không yêu cầu chữ cái thường
+    options.Password.RequireUppercase = false;            // Không yêu cầu chữ cái hoa
+    options.Password.RequireNonAlphanumeric = false;      // Không yêu cầu ký tự đặc biệt (ví dụ: @, #, !, ...)
+    options.Password.RequiredLength = 6;                  // Yêu cầu mật khẩu có độ dài tối thiểu là 6 ký tự
 
     options.Lockout.AllowedForNewUsers = false;  // Vô hiệu hóa Lockout cho người dùng mới
     options.Lockout.MaxFailedAccessAttempts = 5;  // Số lần thử đăng nhập sai tối đa
