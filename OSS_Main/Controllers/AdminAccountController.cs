@@ -47,7 +47,7 @@ namespace OSS_Main.Controllers
             return View(pagedUsers);
         }
         // Xem chi tiết user
-        public async Task<IActionResult> ViewUser(string id)
+        public async Task<IActionResult> AccountDetail(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -115,7 +115,7 @@ namespace OSS_Main.Controllers
             }
         }
 
-        // Xóa user
+        // Xóa user (lỗi không xóa đc, sửa sau)
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string id)
         {
@@ -137,7 +137,7 @@ namespace OSS_Main.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUser(AspNetUser userInput, List<string> newRoles)
+        public async Task<IActionResult> UpdateUser(AspNetUser userInput, List<string> NewRoles)
         {
             var existingUser = await _userService.GetUserForUpdateByIdAsync(userInput.Id);
             if (existingUser == null)
@@ -155,15 +155,15 @@ namespace OSS_Main.Controllers
             // Gọi hàm update user
             var isUserUpdated = await _userService.UpdateUserAsync(existingUser);
 
-            Console.WriteLine($"[DEBUG] New roles: {string.Join(", ", newRoles)}");
+            Console.WriteLine($"[DEBUG] New roles: {string.Join(", ", NewRoles)}");
 
             // Cập nhật role dựa trên "existingUser" (cùng 1 instance)
-            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, newRoles);
+            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, NewRoles);
             if (!isRolesUpdated)
                 return BadRequest("Failed to update user roles.");
 
             if (isUserUpdated)
-                return RedirectToAction("ViewUser", new { id = existingUser.Id });
+                return RedirectToAction("AccountDetail", new { id = existingUser.Id });
             else
                 return BadRequest(new { success = false, message = "Failed to update user." });
         }
