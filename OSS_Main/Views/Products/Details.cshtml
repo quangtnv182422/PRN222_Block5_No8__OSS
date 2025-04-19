@@ -7,7 +7,7 @@
     var allCategories = ViewBag.Categories as List<OSS_Main.Models.Entity.Category> ?? new List<OSS_Main.Models.Entity.Category>();
 }
 
-@if (TempData["Error"] != null)
+@if ( TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
@@ -251,8 +251,3 @@
     </div>
 </div>
 <!-- Single Product End -->
-
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
