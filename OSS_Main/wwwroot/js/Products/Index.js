@@ -3,42 +3,41 @@
     PageSize: 6,
     SortingCategory: "price",
     SearchString: "",
-    CategoryId:0
+    CategoryId: 0
 }
 
 async function updateProductList(data, isUserAuthenticated) {
     let contentHtml = ``;
     for (const product of data) {
         contentHtml += `
-                                    <div class="col-md-6 col-lg-4 col-xl-3">
-                                        <div class="rounded position-relative fruite-item">
-                                         <div class="fruite-img">
-                                                <a href="home/redirectToProductDetails?productId=${product.productId}">
-                                                    <img src="${product.productImages != null && product.productImages.length > 0 ? product.productImages[0].imageUrl : "/assets/img/default-product.jpg"}"
-                                                         class="img-fluid w-100 rounded-top" alt="${product.productName}">
-                                                </a>
-                                            </div>
-                                            <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                    <div class="col-12 col-sm-6 col-md-4 mb-4">
+    <div class="rounded position-relative fruite-item">
+        <div class="fruite-img">
+            <a href="home/redirectToProductDetails?productId=${product.productId}">
+                <img src="${product.productImages != null && product.productImages.length > 0 ? product.productImages[0].imageUrl : "/assets/img/default-product.jpg"}"
+                     class="img-fluid w-100 rounded-top" alt="${product.productName}">
+            </a>
+        </div>
+        <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+            <h4>${product.productName}</h4>
+            <div class="d-flex justify-content-between flex-lg-wrap">
+                <p class="fs-5 fw-bold mb-0" style="color: red;">${product.productSpecs[0].salePrice} VND</p>
+                <p class="fs-5 fw-bold mb-0 text-decoration-line-through text-muted">${product.productSpecs[0].basePrice} VND</p>
 
-                                                <h4>${product.productName}</h4>
-                                                <div class="d-flex justify-content-between flex-lg-wrap">
-                                                    <p class=" fs-5 fw-bold mb-0" style="color: red; font-weight: bold;"> ${product.productSpecs[0].salePrice} VND</p>
-                                                    <p class="text-dark fs-5 fw-bold mb-0" style="color: gray; text-decoration: line-through;">${product.productSpecs[0].basePrice} VND</p>
-
-                                                    <!--Add to cart-->
-                                                    ${isUserAuthenticated ?
-
-                `<a href="home/redirectToProductDetails?productId=${product.productId}&specId=${product.productSpecs[0].productSpecId}" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>`
-
+                <!--Add to cart-->
+                ${isUserAuthenticated ?
+                `<a href="home/redirectToProductDetails?productId=${product.productId}&specId=${product.productSpecs[0].productSpecId}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                </a>`
                 :
                 `<a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
-                                                            <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
-                                                        </a>`}
-                                                </div>
-                                            </div>
+                    <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
+                </a>`}
+            </div>
+        </div>
+    </div>
+</div>
 
-                                        </div>
-                                    </div>
                                     `;
     }
     document.getElementById('productListSection').innerHTML = contentHtml;
