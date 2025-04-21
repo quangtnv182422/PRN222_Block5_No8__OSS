@@ -13,8 +13,8 @@ namespace OSS_Main.Service.Interface
         Task<bool> AddUserAsync(AspNetUser user, string password, string role);
         Task<List<string>> GetAllRolesAsync();
         Task<bool> UpdateUserAsync(AspNetUser userInput);
-        Task<bool> UpdateUserRolesAsync(AspNetUser user, List<string> newRoles);
-        Task<bool> DeleteUserAsync(string userId);
+        Task<bool> UpdateUserRolesAsync(AspNetUser user, string newRole);
+        Task<bool> UpdateUserStatus(string userId, bool status);
         Task<string> AutoCreatePasswords();
         Task<AspNetUser> GetCurrentUserAsync();
         Task<string> GetCurrentUserIdAsync();

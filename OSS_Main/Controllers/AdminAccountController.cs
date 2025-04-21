@@ -73,14 +73,14 @@ namespace OSS_Main.Controllers
 
         // Thêm user mới
         [HttpPost]
-        public async Task<IActionResult> AddUser(string username, string email, string phoneNumber, DateTime DOB, bool gender, string role)
+        public async Task<IActionResult> AddUser(AspNetUser userInput, string Role)
         {
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(userInput.UserName) || string.IsNullOrWhiteSpace(userInput.Email))
             {
-                return Json(new { success = false, message = "Username, Email, and Password are required." });
+                return Json(new { success = false, message = "Username, Email are required." });
             }
 
-            var existingUser = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByEmailAsync(userInput.Email);
             if (existingUser != null)
             {
                 return Json(new { success = false, message = "User with this email already exists." });
@@ -90,23 +90,22 @@ namespace OSS_Main.Controllers
 
             var user = new AspNetUser
             {
-                UserName = email, // fix tạm ở đây hehehehe
-                Email = email,
-                PhoneNumber = phoneNumber,
-                Dob = DOB ,
-                Gender = gender,
+                UserName = userInput.UserName,
+                Email = userInput.Email,
+                PhoneNumber = userInput.PhoneNumber,
+                Dob = userInput.Dob,
+                Gender = userInput.Gender,
             };
             // Cập nhật email đã được xác nhận ngay lập tức
             var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             await _userManager.ConfirmEmailAsync(user, confirmationToken);
             user.LockoutEnabled = false;
 
-            bool result = await _userService.AddUserAsync(user, password, role);
-
+            bool result = await _userService.AddUserAsync(user, password, Role);
 
             if (result)
             {
-                await _emailService.SendWelcomeEmail(email, username, password);
+                await _emailService.SendWelcomeEmail(userInput.Email, userInput.UserName, password);
                 return RedirectToAction("AccountList");
             }
             else
@@ -117,16 +116,15 @@ namespace OSS_Main.Controllers
 
         // Xóa user (lỗi không xóa đc, sửa sau)
         [HttpPost]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> UpdateUserStatus(string Id, bool LockoutEnabled)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(Id))
             {
                 return Json(new { success = false, message = "User ID is required." });
             }
 
-            bool result = await _userService.DeleteUserAsync(id);
-
-            if (result)
+            bool success = await _userService.UpdateUserStatus(Id, LockoutEnabled);
+            if (success)
             {
                 return RedirectToAction("AccountList");
             }
@@ -137,7 +135,7 @@ namespace OSS_Main.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUser(AspNetUser userInput, List<string> NewRoles)
+        public async Task<IActionResult> UpdateUser(AspNetUser userInput, string Role)
         {
             var existingUser = await _userService.GetUserForUpdateByIdAsync(userInput.Id);
             if (existingUser == null)
@@ -155,10 +153,8 @@ namespace OSS_Main.Controllers
             // Gọi hàm update user
             var isUserUpdated = await _userService.UpdateUserAsync(existingUser);
 
-            Console.WriteLine($"[DEBUG] New roles: {string.Join(", ", NewRoles)}");
-
             // Cập nhật role dựa trên "existingUser" (cùng 1 instance)
-            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, NewRoles);
+            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, Role);
             if (!isRolesUpdated)
                 return BadRequest("Failed to update user roles.");
 

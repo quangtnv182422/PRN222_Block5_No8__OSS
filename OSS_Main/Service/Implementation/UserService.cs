@@ -140,28 +140,40 @@ namespace OSS_Main.Service.Implementation
             return result.Succeeded;
         }
 
-        public async Task<bool> UpdateUserRolesAsync(AspNetUser user, List<string> newRoles)
+        public async Task<bool> UpdateUserRolesAsync(AspNetUser user, string newRole)
         {
-            // Lấy roles hiện tại
+            // remove old role
             var currentRoles = await _userManager.GetRolesAsync(user);
 
-            // Xoá roles cũ mà không có trong newRoles
-            var rolesToRemove = currentRoles.Where(r => !newRoles.Contains(r)).ToList();
-            if (rolesToRemove.Any())
-                await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
+            if (currentRoles.Any())
+            {
+                var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
+                if (!removeResult.Succeeded)
+                {
+                    return false;
+                }
+            }
 
-            // Thêm roles mới
-            var rolesToAdd = newRoles.Where(r => !currentRoles.Contains(r)).ToList();
-            if (rolesToAdd.Any())
-                await _userManager.AddToRolesAsync(user, rolesToAdd);
+            //add new role
+            if (!string.IsNullOrWhiteSpace(newRole))
+            {
+                var addResult = await _userManager.AddToRoleAsync(user, newRole);
+                if (!addResult.Succeeded)
+                {
+                    return false;
+                }
+            }
 
             return true;
         }
 
 
-        public async Task<bool> DeleteUserAsync(string userId)
+        public async Task<bool> UpdateUserStatus(string userId, bool LockoutEnabled)
         {
-            return await _userRepository.DeleteUserAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+            user.LockoutEnabled = LockoutEnabled;
+            return await UpdateUserAsync(user);
         }
 
         public async Task<string> AutoCreatePasswords()

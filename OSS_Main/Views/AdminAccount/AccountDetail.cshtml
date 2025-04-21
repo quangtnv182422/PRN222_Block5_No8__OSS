@@ -22,36 +22,45 @@
                 <input type="hidden" name="Id" value="@Model.Id" />
                 <div class="row">
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="username">Username:</label>
+                        <label class="form-label fw-bold" for="username">Username</label>
                         <p class="view-mode">@Model.UserName</p>
                         <input type="text" id="username" class="form-control edit-mode d-none" asp-for="@Model.UserName" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="email">Email:</label>
+                        <label class="form-label fw-bold" for="email">Email</label>
                         <p class="view-mode">@Model.Email</p>
                         <input id="email" class="form-control edit-mode d-none" asp-for="@Model.Email" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="phone">Phone Number:</label>
+                        <label class="form-label fw-bold" for="phone">Phone Number</label>
                         <p class="view-mode">@(Model.PhoneNumber ?? "N/A")</p>
                         <input id="phone" class="form-control edit-mode d-none" asp-for="@Model.PhoneNumber" />
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="gender">Gender:</label>
+                        <label class="form-label fw-bold" for="gender">Gender</label>
                         <p class="view-mode">@(Model.Gender ? "Male" : "Female")</p>
-                        <input id="gender" asp-for="@Model.Gender" class="d-block form-check-input edit-mode d-none" />
+                        <div class="edit-mode d-none">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="male" name="Gender" value="true" checked="@(Model.Gender == true)">
+                                <label class="form-check-label" for="male">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="female" name="Gender" value="false" checked="@(Model.Gender == false)">
+                                <label class="form-check-label" for="female">Female</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="dob">Date of birth:</label>
+                        <label class="form-label fw-bold" for="dob">Date of birth</label>
                         <p class="view-mode">@(Model.Dob != DateTime.MinValue ? Model.Dob.ToString("dd/MM/yyyy") : "N/A")</p>
                         <input type="date" class="form-control edit-mode d-none" id="dob"
                                name="Dob"
-                               value="@(Model.Dob != DateTime.MinValue ? Model.Dob : "")">
+                               value="@(Model.Dob != DateTime.MinValue ? Model.Dob.ToShortDateString() : "")">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="role">Role:</label>
+                        <label class="form-label fw-bold" for="role">Role</label>
                         <p class="view-mode">@(Model.Roles.Any() ? string.Join(", ", Model.Roles.Select(r => r.Name)) : "No Role")</p>
-                        <select id="role" class="form-select edit-mode d-none" multiple name="NewRoles">
+                        <select id="role" class="form-select edit-mode d-none" name="Role">
                             @foreach (var role in ViewBag.AllRoles as List<string>)
                             {
                                 bool isSelected = Model.Roles.Any(r => r.Name == role);
@@ -60,7 +69,7 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="lockout">Status:</label>
+                        <label class="form-label fw-bold" for="lockout">Status</label>
                         <span class="badge view-mode @(Model.LockoutEnabled ? "bg-danger" : "bg-success")">
                             @(Model.LockoutEnabled ? "Locked" : "Active")
                         </span>
@@ -70,11 +79,12 @@
                         </select>
                     </div>
                 </div>
+                <ul class="fw-bold text-danger" id="errorList"></ul>
                 <div class="mt-3 fw-bold">
                     <button type="button" id="editButton" class="btn btn-soft-success" onclick="toggleEditMode()">
                         <i class="bi bi-pencil"></i><span class="ms-2">Edit</span>
                     </button>
-                    <button type="submit" id="saveButton" class="btn btn-primary d-none">
+                    <button type="button" id="saveButton" class="btn btn-primary d-none" onclick="validate()">
                         <i class="bi bi-floppy"></i><span class="ms-2">Save</span>
                     </button>
                     <button type="button" id="cancelButton" class="btn btn-secondary d-none" onclick="toggleEditMode()">
@@ -99,5 +109,36 @@
         editButton.classList.toggle("d-none");
         saveButton.classList.toggle("d-none");
         cancelButton.classList.toggle("d-none");
+    }
+
+    function validate(){
+        let username = document.getElementById("username").value;
+        let email = document.getElementById("email").value;
+        let phone = document.getElementById("phone").value;
+        let dob = document.getElementById("dob").value;
+
+        let ul = document.getElementById("errorList");
+        ul.innerHTML = "";
+        if(!username){
+            ul.innerHTML += `<li>Username must not empty!</li>`
+        }
+        if(!email){
+            ul.innerHTML += `<li>Email must not empty!</li>`
+        }
+        if(!email.match(/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/)){
+            ul.innerHTML += `<li>Invalid email format!</li>`
+        }
+        if(!phone){
+            ul.innerHTML += `<li>Phone must not empty!</li>`
+        }
+        if(!phone.match(/^\d{10,11}$/)){
+            ul.innerHTML += `<li>Invalid phone format!</li>`
+        }
+        if(!dob){
+            ul.innerHTML += `<li>Date of Birth must not empty!</li>`
+        }
+        if(!ul.innerHTML){
+            document.getElementById("editUserForm").submit();
+        }
     }
 </script>
