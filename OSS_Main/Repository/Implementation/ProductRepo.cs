@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OSS_Main.Models.DTO.FilterDTO;
 using OSS_Main.Models.Entity;
 using OSS_Main.Repository.Interface;
 
@@ -207,5 +208,59 @@ namespace OSS_Main.Repository.Implementation
             return await _context.SaveChangesAsync() > 0;
         }
 
-    }
+		public async Task<List<Product>> GetProductByCondition(FilterProductDTO filterProductDTO)
+		{
+            var query = _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductSpecs).AsQueryable();
+            if(filterProductDTO.CategoryId != 0)
+            {
+				query = query.Where(p => p.ProductCategories.Any(pc => pc.CategoryId == filterProductDTO.CategoryId));
+            }
+            if (!string.IsNullOrEmpty(filterProductDTO.SortingCategory))
+            {
+                switch (filterProductDTO.SortingCategory)
+				{
+					case "price":
+						query = query.OrderBy(p => p.ProductSpecs.First().BasePrice);
+						break;
+                    default:
+						query = query.OrderBy(p => p.ProductName);
+						break;
+				}
+            }
+            if (!string.IsNullOrEmpty(filterProductDTO.SearchString))
+            {
+				query = query.Where(p => p.ProductName.Contains(filterProductDTO.SearchString));
+            }
+            return await query.Skip((filterProductDTO.Page - 1) * filterProductDTO.PageSize).Take(filterProductDTO.PageSize).ToListAsync();
+		}
+		public async Task<long> GetTotalProductByCondition(FilterProductDTO filterProductDTO)
+		{
+            var query = _context.Products
+                .Include(p => p.ProductImages)
+                .Include(p => p.ProductSpecs).AsQueryable();
+			if (filterProductDTO.CategoryId != 0)
+			{
+				query = query.Where(p => p.ProductCategories.Any(pc => pc.CategoryId == filterProductDTO.CategoryId));
+			}
+			if (!string.IsNullOrEmpty(filterProductDTO.SortingCategory))
+			{
+				switch (filterProductDTO.SortingCategory)
+				{
+					case "price":
+						query = query.OrderBy(p => p.ProductSpecs.First().BasePrice);
+						break;
+					default:
+						query = query.OrderBy(p => p.ProductName);
+						break;
+				}
+			}
+			if (!string.IsNullOrEmpty(filterProductDTO.SearchString))
+			{
+				query = query.Where(p => p.ProductName.Contains(filterProductDTO.SearchString));
+			}
+            return await query.CountAsync();
+		}
+	}
 }

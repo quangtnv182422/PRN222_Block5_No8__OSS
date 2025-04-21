@@ -1,4 +1,5 @@
-﻿using OSS_Main.Models.Entity;
+﻿using OSS_Main.Models.DTO.FilterDTO;
+using OSS_Main.Models.Entity;
 
 namespace OSS_Main.Repository.Interface
 {
@@ -15,6 +16,9 @@ namespace OSS_Main.Repository.Interface
         List<ProductSpec> GetPagedProducts(int page, int pageSize, out int totalCount);
         bool UpdateProductWithImages(ProductSpec product, List<ProductImage> newImages);
        void RemoveProduct(int productId);
+
+        Task<List<Product>> GetProductByCondition(FilterProductDTO filterProductDTO);
+        Task<long> GetTotalProductByCondition(FilterProductDTO filterProductDTO);
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
     }
 }
