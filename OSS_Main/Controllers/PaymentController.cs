@@ -104,7 +104,7 @@ namespace OSS_Main.Controllers
                                     name = "Hoa Quả",
                                     quantity = cartItemIds.Count,
                                     weight = 1200,
-                                    category = new ShippingOrder.ItemOrderGHN.CategoryGHN { level1 = "Sách" }
+                                    category = new ShippingOrder.ItemOrderGHN.CategoryGHN { level1 = "Quả" }
                                 }
                             }
             };
