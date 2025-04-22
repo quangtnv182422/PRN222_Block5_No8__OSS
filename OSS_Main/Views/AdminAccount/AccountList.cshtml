@@ -37,7 +37,7 @@
                 <select name="roleFilter" class="form-select me-2">
                     <option value="">All Roles</option>
                     <option value="Customer" selected="@(ViewBag.RoleFilter == "Customer")">Customer</option>
-                    <option value="Admin" selected="@(ViewBag.RoleFilter == "Admin")">Admin</option>
+                    @* <option value="Admin" selected="@(ViewBag.RoleFilter == "Admin")">Admin</option> *@
                     <option value="Sales" selected="@(ViewBag.RoleFilter == "Sales")">Sales</option>
                 </select>
                 <select name="statusFilter" class="form-select me-2">

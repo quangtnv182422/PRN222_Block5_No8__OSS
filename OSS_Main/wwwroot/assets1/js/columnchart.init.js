@@ -1,4 +1,4 @@
-var options1 = {
+var options = {
     series: [ {
         name: 'Revenue',
         data: [256000, 480000, 560000, 760000, 850000, 1010000, 980000, 870000, 1050000, 910000, 1140000, 940000]
@@ -56,8 +56,5 @@ var options1 = {
     }
 };
 
-var chart1 = new ApexCharts(document.querySelector("#dashboard"), options1);
-chart1.render();
-
-
-chart2.render();
+var chart = new ApexCharts(document.querySelector("#dashboard"), options);
+chart.render();

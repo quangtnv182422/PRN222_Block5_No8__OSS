@@ -46,9 +46,9 @@ namespace OSS_Main.Repository.Implementation
 
             var users = await query.ToListAsync();
 
-            // Nếu có lọc Role, phải gọi GetRolesAsync để kiểm tra user nào có role đó
             if (!string.IsNullOrEmpty(roleFilter))
             {
+                // Lọc role theo filter
                 var filteredUsers = new List<AspNetUser>();
 
                 foreach (var user in users)
@@ -61,8 +61,22 @@ namespace OSS_Main.Repository.Implementation
                 }
                 return filteredUsers;
             }
-            return users;
+            else
+            {
+                //Lọc role khác Admin
+                var notAdminUser = new List<AspNetUser>();
 
+                foreach (var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (!roles.Contains("Admin"))
+                    {
+                        notAdminUser.Add(user);
+                    }
+                }
+
+                return notAdminUser;
+            }
         }
 
         public async Task<bool> AddUserAsync(AspNetUser user, string password)
