@@ -74,6 +74,7 @@ namespace OSS_Main.Controllers
             //ViewBag.SelectedCategoryId = filter.CategoryId;
             //ViewBag.AllProducts = allProductsWithCategory ?? new List<Product>();
             //ViewBag.Categories = categories;
+
             List<Product> products = await _productService.SearchProduct(filter);
             List<ProductDTO> productsDTO = products.Select(p => Mapper.Map<Product, ProductDTO>(p) ?? new ProductDTO()).ToList();
             long total = await _productService.GetTotalProduct(filter);

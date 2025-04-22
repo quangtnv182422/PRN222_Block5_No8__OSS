@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     public class PaymentController : Controller
     {
         //	9704198526191432198

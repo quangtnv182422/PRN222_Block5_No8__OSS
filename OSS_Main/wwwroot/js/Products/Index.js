@@ -8,6 +8,7 @@
 
 async function updateProductList(data, isUserAuthenticated) {
     let contentHtml = ``;
+    console.log("Data:", data);
     for (const product of data) {
         contentHtml += `
                                     <div class="col-12 col-sm-6 col-md-4 mb-4">

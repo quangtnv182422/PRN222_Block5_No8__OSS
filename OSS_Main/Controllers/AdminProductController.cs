@@ -7,6 +7,7 @@ using OSS_Main.Service.Interface;
 
 namespace OSS_Main.Controllers
 {
+    [Authorize(Roles = "Admin, Sales")]
     public class AdminProductController : Controller
     {
         private readonly IProductService _productService;

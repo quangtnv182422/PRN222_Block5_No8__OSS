@@ -1,131 +1,131 @@
-﻿@* <!DOCTYPE html> 
- <html lang="en"> 
- <head> 
-     <meta charset="utf-8" /> 
-     <title>@ViewData["Title"] - Admin Dashboard</title> 
-     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+﻿@* <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>@ViewData["Title"] - Admin Dashboard</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-     <!-- favicon --> 
-     <link rel="shortcut icon" href="~/assets1/images/favicon.ico.png"> 
-     <!-- icon--> 
-     <link href="https://unicons.iconscout.com/release/v3.0.6/css/line.css" rel="stylesheet"> 
+        <!-- favicon -->
+        <link rel="shortcut icon" href="~/assets1/images/favicon.ico.png">
+        <!-- icon-->
+        <link href="https://unicons.iconscout.com/release/v3.0.6/css/line.css" rel="stylesheet">
 
-     <!-- Bootstrap --> 
-     <link href="~/assets1/css/bootstrap.min.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/simplebar.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/select2.min.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/materialdesignicons.min.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/remixicon.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/tiny-slider.css" rel="stylesheet" /> 
-     <link href="~/assets1/css/style.min.css" rel="stylesheet" id="theme-opt" /> 
-     <style> 
-     </style> 
- </head> 
- <body> 
+        <!-- Bootstrap -->
+        <link href="~/assets1/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/assets1/css/simplebar.css" rel="stylesheet" />
+        <link href="~/assets1/css/select2.min.css" rel="stylesheet" />
+        <link href="~/assets1/css/materialdesignicons.min.css" rel="stylesheet" />
+        <link href="~/assets1/css/remixicon.css" rel="stylesheet" />
+        <link href="~/assets1/css/tiny-slider.css" rel="stylesheet" />
+        <link href="~/assets1/css/style.min.css" rel="stylesheet" id="theme-opt" />
+        <style>
+        </style>
+    </head>
+    <body>
 
-     <div class="page-wrapper doctris-theme toggled"> 
-         <!-- Sidebar --> 
-         <nav id="sidebar" class="sidebar-wrapper"> 
-             <div class="sidebar-content" data-simplebar> 
-                 <div class="sidebar-brand"> 
-                     <a href="@Url.Action("Index", "Admin")"> 
-                         <img src="~/assets1/images/favicon.ico.png" height="24" alt=""> 
-                     </a> 
-                 </div> 
-                 @if (User.Identity.IsAuthenticated) 
-                 { 
-                     if (User.IsInRole("Admin")) 
-                     { 
-                         <p>You are an Admin!</p> 
-                     } 
-                     else if (User.IsInRole("Sales")) 
-                     { 
-                         <p>You are a regular User.</p> 
-                     } 
-                     else 
-                     { 
-                         <p>You do not have any specific role.</p> 
-                     } 
-                 } 
-                 else 
-                 { 
-                     <p>You are not authenticated.</p> 
-                 } 
+        <div class="page-wrapper doctris-theme toggled">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="sidebar-wrapper">
+                <div class="sidebar-content" data-simplebar>
+                    <div class="sidebar-brand">
+                        <a href="@Url.Action("Index", "Admin")">
+                            <img src="~/assets1/images/favicon.ico.png" height="24" alt="">
+                        </a>
+                    </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <p>You are an Admin!</p>
+                        }
+                        else if (User.IsInRole("Sales"))
+                        {
+                            <p>You are a regular User.</p>
+                        }
+                        else
+                        {
+                            <p>You do not have any specific role.</p>
+                        }
+                    }
+                    else
+                    {
+                        <p>You are not authenticated.</p>
+                    }
 
-             <ul class="sidebar-menu pt-3"> 
-                 <!--Both--> 
-                 @if (User.Identity.IsAuthenticated) 
-                 { 
-                     <li><a href="@Url.Action("Index", "Dashboard")"><i class="uil uil-dashboard me-2"></i>Dashboard</a></li> 
-                 } 
-                 @if (User.Identity.IsAuthenticated && User.IsInRole("Admin")) 
-                 { 
-                     <!--Admin--> 
-                     <li><a href="@Url.Action("ProductList", "AdminProduct")"><i class="uil uil-box me-2"></i>Product List</a></li> 
-                     <li><a href="@Url.Action("AccountList", "AdminAccount")"><i class="uil uil-stethoscope me-2"></i>Account List</a></li> 
+                <ul class="sidebar-menu pt-3">
+                    <!--Both-->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><a href="@Url.Action("Index", "Dashboard")"><i class="uil uil-dashboard me-2"></i>Dashboard</a></li>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        <!--Admin-->
+                        <li><a href="@Url.Action("ProductList", "AdminProduct")"><i class="uil uil-box me-2"></i>Product List</a></li>
+                        <li><a href="@Url.Action("AccountList", "AdminAccount")"><i class="uil uil-stethoscope me-2"></i>Account List</a></li>
 
-                 } 
-                 @if (User.Identity.IsAuthenticated) 
-                 { 
-                     <!--Both--> 
-                     <li><a href="@Url.Action("Index", "Sale")"><i class="uil uil-stethoscope me-2"></i>Order Tracking</a></li> 
-                 } 
-                 <li><a href="@Url.Action("Index", "Home")"><i class="uil uil-stethoscope me-2"></i>Home</a></li> 
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <!--Both-->
+                        <li><a href="@Url.Action("Index", "Sale")"><i class="uil uil-stethoscope me-2"></i>Order Tracking</a></li>
+                    }
+                    <li><a href="@Url.Action("Index", "Home")"><i class="uil uil-stethoscope me-2"></i>Home</a></li>
 
 
-             </ul> 
-             </div> 
-         </nav> 
+                </ul>
+                </div>
+            </nav>
 
-         <!-- Main Content --> 
-         <main class="page-content bg-light"> 
-             <div class="top-header"> 
-                 <div class="header-bar d-flex justify-content-between border-bottom"> 
-                     <div class="d-flex align-items-center"> 
-                         <a id="close-sidebar" class="btn btn-icon btn-soft-primary ms-2" href="#"> 
-                             <i class="uil uil-bars"></i> 
-                         </a> 
-                     </div> 
+            <!-- Main Content -->
+            <main class="page-content bg-light">
+                <div class="top-header">
+                    <div class="header-bar d-flex justify-content-between border-bottom">
+                        <div class="d-flex align-items-center">
+                            <a id="close-sidebar" class="btn btn-icon btn-soft-primary ms-2" href="#">
+                                <i class="uil uil-bars"></i>
+                            </a>
+                        </div>
 
-                     <ul class="list-unstyled mb-0"> 
-                         <li class="list-inline-item mb-0 ms-1"> 
-                             <a  asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="btn btn-icon btn-soft-danger"> 
-                                 <i class="uil uil-sign-out-alt"></i> 
-                             </a> 
-                         </li> 
-                     </ul> 
-                 </div> 
-             </div> 
+                        <ul class="list-unstyled mb-0">
+                            <li class="list-inline-item mb-0 ms-1">
+                                <a  asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="btn btn-icon btn-soft-danger">
+                                    <i class="uil uil-sign-out-alt"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
 
-             <div class="container-fluid"> 
-                 <div class="layout-specing"> 
-                     @RenderBody() 
-                 </div> 
-             </div> 
+                <div class="container-fluid">
+                    <div class="layout-specing">
+                        @RenderBody()
+                    </div>
+                </div>
 
-             <!-- Footer --> 
-             <footer class="bg-white shadow py-3"> 
-                 <div class="container-fluid"> 
-                     <div class="row align-items-center"> 
-                         <div class="col"> 
-                             <p class="mb-0 text-muted">&copy; @DateTime.Now.Year - Admin Dashboard</p> 
-                         </div> 
-                     </div> 
-                 </div> 
-             </footer> 
-         </main> 
-     </div> 
+                <!-- Footer -->
+                <footer class="bg-white shadow py-3">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <p class="mb-0 text-muted">&copy; @DateTime.Now.Year - Admin Dashboard</p>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </main>
+        </div>
 
-     <!-- Scripts --> 
-     <script src="~/assets1/js/bootstrap.bundle.min.js"></script> 
-     <script src="~/assets1/js/simplebar.min.js"></script> 
-     <script src="~/assets1/js/apexcharts.min.js"></script> 
-     <script src="~/assets1/js/app.js"></script> 
-     <script src="~/assets1/js/columnchart.init.js"></script> 
-     <!-- Icons --> 
-     <script src="~/assets1/js/feather.min.js"></script> 
- </body> 
- </html> *@
+        <!-- Scripts -->
+        <script src="~/assets1/js/bootstrap.bundle.min.js"></script>
+        <script src="~/assets1/js/simplebar.min.js"></script>
+        <script src="~/assets1/js/apexcharts.min.js"></script>
+        <script src="~/assets1/js/app.js"></script>
+        <script src="~/assets1/js/columnchart.init.js"></script>
+        <!-- Icons -->
+        <script src="~/assets1/js/feather.min.js"></script>
+    </body>
+    </html> *@
 
 <!DOCTYPE html>
 <html lang="en">
@@ -140,7 +140,7 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="~/css/bootstrap.min.css" rel="stylesheet">
-    <link href="~/assets1/css/site.css" rel="stylesheet" asp-append-version="true"/>
+    <link href="~/assets1/css/site.css" rel="stylesheet" asp-append-version="true" />
 </head>
 
 <body>
@@ -166,7 +166,7 @@
                             <a asp-area="" asp-controller="Tracking" asp-action="Index" class="nav-item nav-link">Order Tracking</a>
                         }
 
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") || User.IsInRole("Sale"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") || User.IsInRole("Sales"))
                         {
                             <a asp-area="" asp-controller="Dashboard" asp-action="Index" class="nav-item nav-link">Dashboard</a>
                         }
@@ -194,14 +194,27 @@
     <div class="row w-100" style="padding-top: 130px;">
         <nav class="col-2">
             <div class="fw-bold d-flex flex-column align-items-center justify-content-between" style="height:40vh">
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                @{
+                    bool isAuthenticated = User.Identity.IsAuthenticated;
+                    bool isAdmin = User.IsInRole("Admin");
+                    bool isSales = User.IsInRole("Sales");
+                    string roleLabel = isAdmin ? "Admin" : (isSales ? "Sales" : "User");
+                }
+
+                @if (isAuthenticated && (isAdmin || isSales))
+                {
+                    <div class="mb-3">You are: <span class="text-primary">@roleLabel</span></div>
+
+                    <div><i class="bi bi-speedometer2"></i><a class="ms-2" href="@Url.Action("Index", "Dashboard")">Dashboard</a></div>
+                    <div><i class="bi bi-box"></i><a class="ms-2" href="@Url.Action("ProductList", "AdminProduct")">Product List</a></div>
+
+                    @if (isAdmin)
                     {
-                        <div><i class="bi bi-speedometer2"></i><a class="ms-2" href="@Url.Action("Index", "Dashboard")">Dashboard</a></div>
-                        <div><i class="bi bi-box"></i><a class="ms-2" href="@Url.Action("ProductList", "AdminProduct")">Product List</a></div>
-                        <div><i class="bi bi-person-lines-fill"></i><a class="ms-2" href="@Url.Action("AccountList", "AdminAccount")">Account List</a></div>
-                        <div><i class="bi bi-cart"></i><a class ="ms-2" href="@Url.Action("Index", "Sale")">Order Tracking</a></div>
+                        <div><i class="bi bi-person-lines-fill"></i><a class="ms-2" href="@Url.Action("AccountList", "AdminAccount")">Account List</a></div>//Chỉ có Admin thấy đc account list
                     }
-                    <div><i class="bi bi-house"></i><a class="ms-2" href="@Url.Action("Index", "Home")">Home</a></div>
+                    <div><i class="bi bi-cart"></i><a class="ms-2" href="@Url.Action("Index", "Sale")">Order Tracking</a></div>
+                }
+                <div><i class="bi bi-house"></i><a class="ms-2" href="@Url.Action("Index", "Home")">Home</a></div>
             </div>
         </nav>
         <main role="main" class="pb-3 col-10">

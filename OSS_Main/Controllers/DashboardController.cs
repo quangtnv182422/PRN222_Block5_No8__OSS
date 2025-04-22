@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Sales")]
     public class DashboardController : Controller
     {
 

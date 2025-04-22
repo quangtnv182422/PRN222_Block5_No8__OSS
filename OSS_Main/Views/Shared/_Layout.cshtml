@@ -64,7 +64,7 @@
                             <a asp-area="" asp-controller="Tracking" asp-action="Index" class="nav-item nav-link">Order Tracking</a>
                         }
 
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") || User.IsInRole("Sale"))
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin") || User.IsInRole("Sales"))
                         {
                             <a asp-area="" asp-controller="Dashboard" asp-action="Index" class="nav-item nav-link">Dashboard</a>
                         }

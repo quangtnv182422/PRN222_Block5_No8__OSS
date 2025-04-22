@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
@@ -10,6 +11,7 @@ using System.Text.Json;
 
 namespace OSS_Main.Controllers
 {
+    [Authorize(Roles = "Admin, Sales")]
     public class SaleController : Controller
     {
         private readonly IVnPayProxy _vnPayService;

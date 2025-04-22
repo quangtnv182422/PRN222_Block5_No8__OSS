@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Customer")]
     public class OrderController : Controller
     {
         private readonly IConfiguration _configuration;
