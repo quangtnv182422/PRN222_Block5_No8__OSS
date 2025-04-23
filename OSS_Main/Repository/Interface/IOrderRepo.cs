@@ -9,5 +9,7 @@ namespace OSS_Main.Repository.Interface
         Task<Order> GetOrderByIdAsync(string orderId);
         Task<List<Order>> GetOrderByCustomerIdAsync(string customerId);
         Task<List<Order>> GetAllOrderAsync();
+        Task<List<Order>> GetAllOrderShippingAsync();
+        Task<OrderStatus> GetOrderStatusByNameAsync(string orderStatusName);
     }
 }

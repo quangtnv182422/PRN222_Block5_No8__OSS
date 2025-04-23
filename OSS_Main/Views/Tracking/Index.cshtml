@@ -74,19 +74,19 @@ else
                         <td style="padding: 8px;">
                             @if (order.OrderStatusId == 1)
                             {
-                                <span class="badge bg-success">Pending confirmation</span>
+                                <span class="badge bg-success">@order.OrderStatus.OrderDisplay</span>
                             }
                             else if (order.OrderStatusId == 2)
                             {
-                                <span class="badge bg-info">Ready to Ship</span>
+                                <span class="badge bg-info">@order.OrderStatus.OrderDisplay</span>
                             }
-                            else if (order.OrderStatusId == 3)
+                            else if (order.OrderStatusId == 6)
                             {
                                 <span class="badge bg-danger">Cancel</span>
                             }
                             else
                             {
-                                <span class="badge bg-danger">Exception</span>
+                                <span class="badge bg-success">@order.OrderStatus.OrderDisplay</span>
                             }
                         </td>
 

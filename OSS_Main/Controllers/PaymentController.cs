@@ -72,7 +72,7 @@ namespace OSS_Main.Controllers
 
             //Tạo order lưu vào DB với trạng thái pending
             var order = await _orderService.CreateOrderAsync(userId, paymentMethod, cartItemIds,
-                                                (float)totalCost, 1, deliveryNotes, receiverInforId, null); // 1 là pending confirm dành cho COD
+                                                (float)totalCost, 1, deliveryNotes, receiverInforId, null); // 1 là waiting_confirmation dành cho COD
 
             // DTO để lưu thông tin order được gửi qua GHN
             var shippingOrder = new ShippingOrder
@@ -296,7 +296,7 @@ namespace OSS_Main.Controllers
                 var updateOrder = await _orderService.GetOrderByIdAsync(response.OrderId);
                 if (updateOrder != null)
                 {
-                    updateOrder.OrderStatusId = 2;
+                    updateOrder.OrderStatusId = 2; //orderstatus là confirmed_order
                     updateOrder.PaymentMethod = "vnPay";
                     await _orderService.UpdateOrderOnGHNAsync(updateOrder);
 
@@ -364,7 +364,7 @@ namespace OSS_Main.Controllers
                 var updateOrder = await _orderService.GetOrderByIdAsync(orderId);
                 if (updateOrder != null)
                 {
-                    updateOrder.OrderStatusId = 2;
+                    updateOrder.OrderStatusId = 2; // orderstatus là confirmed_order
                     updateOrder.PaymentMethod = "PayOS";
                     await _orderService.UpdateOrderOnGHNAsync(updateOrder);
 

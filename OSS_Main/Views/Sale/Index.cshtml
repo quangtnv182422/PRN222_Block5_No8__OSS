@@ -53,23 +53,8 @@
                     @Html.DisplayFor(modelItem => item.Notes)
                 </td>
                 <td>
-                    @{
-                        string status = string.Empty;
-                        if (item.OrderStatusId == 1)
-                        {
-                            status = "Pending Confirmation";
-                        }
-                        else if (item.OrderStatusId == 2)
-                        {
-                            status = "Confirmed";
-                        }
-                        else
-                        {
-                            status = "Canceled";
-                        }
-                    }
-
-                    @Html.DisplayFor(modelItem => status)
+               
+                    @Html.DisplayFor(modelItem => item.OrderStatus.OrderDisplay)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.TotalCost)
@@ -112,11 +97,19 @@
                         }
 
                     }
-                    else
+                    else if (item.OrderStatusId == 6)
                     {
                         <div class="text-danger font-weight-bold">
                             The order is canceled.
                         </div>
+                    }
+                    else if (item.OrderStatusId == 20)//order status là returning thì hiện nút confirm returned để đảm bảo đã trả hàng
+                    {
+                        <button class="btn btn-success btn-sm"
+                                onclick="window.location.href='@Url.Action("ConfirmReturned", "Sale", new { orderId = item.OrderId })'">
+                            Confirm Returned
+                        </button>
+                
                     }
                 </td>
 

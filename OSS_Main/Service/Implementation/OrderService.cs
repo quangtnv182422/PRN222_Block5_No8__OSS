@@ -70,7 +70,7 @@ namespace OSS_Main.Service.Implementation
             // Gửi email xác nhận (nếu cần)
             var receiverInfor = await _receiverService.GetDefaultReceiverInfoByIdAsync(receiverId);
             string fullAddress = $"{receiverInfor.Address}, {receiverInfor.WardName_GHN}, {receiverInfor.DistrictName_GHN}, {receiverInfor.ProvinceName_GHN}";
-            string link = "https://localhost:7012/Products/Index";
+            string link = "https://localhost:7012/Products/Index";//fix cứng tạm thời
             var user = _httpContextAccessor.HttpContext?.User;
             var email = user != null ? (await _userManager.GetUserAsync(user))?.Email : null;
 
@@ -214,6 +214,15 @@ namespace OSS_Main.Service.Implementation
         public async Task<List<Order>> GetAllOrderAsync()
         {
             return await _orderRepo.GetAllOrderAsync();
+        }
+
+        public async Task<List<Order>> GetAllOrderShippingAsync()
+        {
+            return await _orderRepo.GetAllOrderShippingAsync();
+        }
+        public async Task<OrderStatus> GetOrderStatusByNameAsync(string orderStatusName)
+        {
+            return await _orderRepo.GetOrderStatusByNameAsync(orderStatusName);
         }
     }
 }

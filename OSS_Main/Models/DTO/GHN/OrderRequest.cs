@@ -2,6 +2,7 @@
 {
     public class OrderRequest
     {
-       public List<string> order_codes { get; set; }
+       public List<string>? order_codes { get; set; }
+       public string? order_code { get; set; }
     }
 }

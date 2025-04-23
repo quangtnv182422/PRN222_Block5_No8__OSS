@@ -22,7 +22,7 @@ namespace OSS_Main.Controllers
         private readonly IProductService _productService;
         private readonly IGhnProxy _ghnService;
         private readonly IReceiveInforService _receiveInforService;
-        private readonly Prn222ProjectContext _context;
+        private readonly Prn222ProjectContext _context; // chỗ này bị lười cập nhật ở service:)))
         public OrderController(ICartService cartService, 
                                             IOrderService orderService,
                                             IUserService userService, 
@@ -247,7 +247,7 @@ namespace OSS_Main.Controllers
                     return NotFound("Order not found.");
                 }
 
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 return RedirectToAction("Index", "Tracking");
             }

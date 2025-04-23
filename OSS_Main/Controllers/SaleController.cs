@@ -166,7 +166,7 @@ namespace OSS_Main.Controllers
                 }
                 else
                 {
-                    order.OrderStatusId = 3; //3 là cancel order
+                    order.OrderStatusId = 6; //6 là cancel order
                     await _orderService.UpdateOrderOnGHNAsync(order);
                     await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
                     return RedirectToAction("Index");
@@ -189,7 +189,7 @@ namespace OSS_Main.Controllers
                 {
                     return NotFound("Order not found.");
                 }
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
                 return RedirectToAction("Index");
@@ -210,8 +210,29 @@ namespace OSS_Main.Controllers
                 {
                     return NotFound("Order not found.");
                 }
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> ConfirmReturned(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId.ToString());
+                if (order == null)
+                {
+                    return NotFound("Order not found.");
+                }
+                order.OrderStatusId = 22; //22 là returned order
+                await _orderService.UpdateOrderOnGHNAsync(order);
+                await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
