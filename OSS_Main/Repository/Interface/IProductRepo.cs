@@ -15,8 +15,6 @@ namespace OSS_Main.Repository.Interface
         List<ProductSpec> GetPagedProducts(int page, int pageSize, out int totalCount);
         bool UpdateProductWithImages(ProductSpec product, List<ProductImage> newImages);
        void RemoveProduct(int productId);
-        void AddReview(Feedback feedback);
-        Task<List<Feedback>> GetReviews(int? productId);
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
     }
 }

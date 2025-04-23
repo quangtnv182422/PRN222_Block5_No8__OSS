@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OSS_Main.Models.Entity;
 using OSS_Main.Repository.Interface;
 
@@ -207,31 +206,6 @@ namespace OSS_Main.Repository.Implementation
             // Lưu tất cả thay đổi vào cơ sở dữ liệu
             return await _context.SaveChangesAsync() > 0;
         }
-        public IEnumerable<Feedback> GetReviewsByProduct(int productId)
-        {
-            return _context.Feedbacks
-                .Where(f => f.ProductId == productId && f.Status == "Enable" )
-                .OrderByDescending(f => f.RatedStar)
-                .ThenByDescending(f => f.CreatedAt)
-                .ToList();
-        }
 
-        public void AddReview(Feedback feedback)
-        {
-            feedback.CreatedAt = DateTime.Now;
-            feedback.Status = "Enable";
-            _context.Feedbacks.Add(feedback);
-            _context.SaveChanges();
-        }
-
-        public async Task<List<Feedback>> GetReviews(int? productId)
-        {
-            return await _context.Feedbacks
-    .Where(f => f.ProductId == productId)
-    .Include(f => f.Medias) // nếu muốn kèm theo ảnh/video
-    .Include(f => f.Customer) // nếu muốn kèm theo thông tin người gửi
-    .OrderByDescending(f => f.CreatedAt)
-    .ToListAsync();
-        }
     }
 }
