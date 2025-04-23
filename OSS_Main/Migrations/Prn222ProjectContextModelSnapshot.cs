@@ -354,40 +354,6 @@ namespace OSS_Main.Migrations
                     b.ToTable("Feedbacks");
                 });
 
-            modelBuilder.Entity("OSS_Main.Models.Entity.Media", b =>
-                {
-                    b.Property<int>("MediaId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MediaId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FeedbackId")
-                        .HasColumnType("int");
-
-                    b.Property<byte>("MediaType")
-                        .HasColumnType("tinyint");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("MediaId");
-
-                    b.HasIndex("FeedbackId");
-
-                    b.ToTable("Medias");
-                });
-
             modelBuilder.Entity("OSS_Main.Models.Entity.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -732,17 +698,6 @@ namespace OSS_Main.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("OSS_Main.Models.Entity.Media", b =>
-                {
-                    b.HasOne("OSS_Main.Models.Entity.Feedback", "Feedback")
-                        .WithMany("Medias")
-                        .HasForeignKey("FeedbackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Feedback");
-                });
-
             modelBuilder.Entity("OSS_Main.Models.Entity.Order", b =>
                 {
                     b.HasOne("OSS_Main.Models.Entity.AspNetUser", "Customer")
@@ -863,8 +818,6 @@ namespace OSS_Main.Migrations
 
             modelBuilder.Entity("OSS_Main.Models.Entity.Feedback", b =>
                 {
-                    b.Navigation("Medias");
-
                     b.Navigation("OrderItems");
                 });
 
