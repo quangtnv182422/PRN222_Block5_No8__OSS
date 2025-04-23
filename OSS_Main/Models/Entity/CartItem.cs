@@ -14,7 +14,7 @@ public partial class CartItem
     public int Quantity { get; set; }
 
     public decimal PriceEachItem { get; set; }
-
+    //
 	public string ProductName { get; set; } = null!;
 
 	public string? Description { get; set; }
@@ -24,7 +24,7 @@ public partial class CartItem
 	public decimal BasePrice { get; set; }
 
 	public decimal? SalePrice { get; set; }
-
+    //
 	public virtual Cart Cart { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
