@@ -16,6 +16,10 @@ namespace OSS_Main.Service.Interface
         bool UpdateProductWithImages(ProductSpec product, List<ProductImage> newImages);
         Task UpdateProductQuantityAfterCancel(ICollection<OrderItem> orderItem);
         void RemoveProduct(int productId);
+        void AddReview(Feedback fb);
+        Task<List<Feedback>> GetReviews(int? productId);
+
+
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
     }
 }

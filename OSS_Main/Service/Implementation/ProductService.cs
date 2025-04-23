@@ -96,6 +96,17 @@ namespace OSS_Main.Service.Implementation
         {
             return await _productRepo.AddProductWithImages(product,  SpecName,  SalePrice,  BasePrice,  Quantity,  productImages);
         }
+
+
+        public  void AddReview(Feedback fb)
+        {
+              _productRepo.AddReview(fb);
+        }
+
+        public Task<List<Feedback>> GetReviews(int? productId)
+        {
+            return _productRepo.GetReviews(productId);
+        }
     }
 
 }
