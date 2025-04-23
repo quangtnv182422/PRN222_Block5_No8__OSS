@@ -30,6 +30,8 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<OrderStatus> OrderStatuses { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductCategory> ProductCategories { get; set; }
@@ -126,6 +128,12 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItemOrders).HasForeignKey(d => d.OrderId);
 
         });
+        modelBuilder.Entity<OrderStatus>(entity =>
+        {
+            entity.HasKey(e => e.OrderStatusId);
+            entity.Property(e => e.OrderStatusName).HasMaxLength(100).IsRequired();
+        });
+
 
         modelBuilder.Entity<Product>(entity =>
         {

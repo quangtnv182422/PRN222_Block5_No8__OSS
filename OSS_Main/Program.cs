@@ -13,6 +13,7 @@ using OSS_Main.Repository.Implementation;
 using OSS_Main.Repository.Interface;
 using OSS_Main.Service.Implementation;
 using OSS_Main.Service.Interface;
+using OSS_Main.Synchronize;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -115,6 +116,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddHostedService<ShippingSync>(); // woker service để chạy ngầm các task
+
 
 var app = builder.Build();
 

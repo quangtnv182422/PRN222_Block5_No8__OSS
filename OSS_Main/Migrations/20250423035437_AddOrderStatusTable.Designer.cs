@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OSS_Main.Models.Entity;
 
@@ -11,9 +12,11 @@ using OSS_Main.Models.Entity;
 namespace OSS_Main.Migrations
 {
     [DbContext(typeof(Prn222ProjectContext))]
-    partial class Prn222ProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20250423035437_AddOrderStatusTable")]
+    partial class AddOrderStatusTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -453,18 +456,13 @@ namespace OSS_Main.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderStatusId"));
 
-                    b.Property<string>("OrderDisplay")
+                    b.Property<string>("OrderStatusName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrderStatusName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.HasKey("OrderStatusId");
 
-                    b.ToTable("OrderStatuses");
+                    b.ToTable("OrderStatus");
                 });
 
             modelBuilder.Entity("OSS_Main.Models.Entity.Product", b =>

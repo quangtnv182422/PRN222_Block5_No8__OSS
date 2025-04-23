@@ -28,4 +28,6 @@ public partial class Order
     public virtual ICollection<OrderItem> OrderItemOrders { get; set; } = new List<OrderItem>();
 
     public virtual ReceiverInformation Receiver { get; set; } = null!;
+    public virtual OrderStatus OrderStatus { get; set; } = null!;
+
 }
