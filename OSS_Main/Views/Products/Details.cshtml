@@ -1,4 +1,7 @@
-﻿@model OSS_Main.Models.Entity.Product
+﻿@using Microsoft.IdentityModel.Tokens
+@using OSS_Main.Models.Entity
+
+@model OSS_Main.Models.Entity.Product
 
 @{
     ViewData["Title"] = "Details";
@@ -13,7 +16,32 @@
         @TempData["Error"]
     </div>
 }
+<style>
+    .text-silver {
+        color: #c0c0c0 !important; /* Màu bạc */
+    }
 
+    .star-icon {
+        font-size: 1.5rem;
+        color: #c0c0c0; /* màu bạc ban đầu */
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .star-icon.selected {
+            color: #ffc107; /* màu vàng Bootstrap (text-warning) */
+        }
+
+    h3.review-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #0d6efd; /* màu xanh Bootstrap */
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+    }
+</style>
 <!-- Single Product Start -->
 <div class="container-fluid py-5 mt-5">
     <div class="container py-5">
@@ -136,48 +164,62 @@
                             </div>
 
                             <!--Reveiew-->
-                            <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
-                                <div class="d-flex">
-                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
-                                    <div class="">
-                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Jason Smith</h5>
-                                            <div class="d-flex mb-3">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
+                            <!-- Hiển thị danh sách Feedback -->
+                            <div class="tab-pane style=" max-height: 500px; overflow-y: auto;"" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+                                <!-- Form gửi Feedback -->
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <form asp-controller="Products" asp-action="AddFeedback" method="post" enctype="multipart/form-data" class="mt-4">
+                                        <input type="hidden" name="ProductId" value="@product.ProductId" />
+                                        <div class="mb-3">
+                                            <label class="form-label">Rating</label>
+                                            <div id="star-rating" class="mb-2">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="fa fa-star star-icon" data-value="@i"></i>
+                                                }
                                             </div>
+                                            <input type="hidden" name="Rating" id="ratingInput" value="0" />
                                         </div>
-                                        <p>
-                                            The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic
-                                            words etc. Susp endisse ultricies nisi vel quam suscipit
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="d-flex">
-                                    <img src="img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
-                                    <div class="">
-                                        <p class="mb-2" style="font-size: 14px;">April 12, 2024</p>
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Sam Peters</h5>
-                                            <div class="d-flex mb-3">
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <i class="fa fa-star"></i>
-                                                <i class="fa fa-star"></i>
-                                            </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Comment</label>
+                                            <textarea class="form-control" name="Comment" required></textarea>
                                         </div>
-                                        <p class="text-dark">
-                                            The generated Lorem Ipsum is therefore always free from repetition injected humour, or non-characteristic
-                                            words etc. Susp endisse ultricies nisi vel quam suscipit
-                                        </p>
-                                    </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Image (optional)</label>
+                                            <input type="file" name="ImageFile" accept="image/*" class="form-control" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Video (optional)</label>
+                                            <input type="file" name="VideoFile" accept="video/*" class="form-control" />
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <p class="text-danger">Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to submit feedback.</p>
+                                }
+                                <h3 class="nav-link border-white border-bottom-0 review-title"> Review</h3>
+                                <div class="d-flex justify-content-end mb-3">
+                                    <select id="sortSelect" class="form-select w-auto">
+                                        <option value="newest" selected>Newest First</option>
+                                        <option value="oldest">Oldest First</option>
+                                        <option value="rating_desc">Rating: High to Low</option>
+                                        <option value="rating_asc">Rating: Low to High</option>
+                                    </select>
                                 </div>
+
+
+                                <div id="feedback-container">
+                                    @Html.Partial("_FeedbackList", ViewBag.Feedbacks as List<Feedback>)
+                                </div>
+
+
+
+                              
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -252,7 +294,40 @@
 </div>
 <!-- Single Product End -->
 
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.ProductId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+<script src="js/rating.js"></script>
+<script>
+    const stars = document.querySelectorAll('.star-icon');
+      const ratingInput = document.getElementById('ratingInput');
+
+      stars.forEach(star => {
+          star.addEventListener('click', () => {
+              const selectedValue = parseInt(star.getAttribute('data-value'));
+              ratingInput.value = selectedValue;
+
+              stars.forEach(s => {
+                  const starValue = parseInt(s.getAttribute('data-value'));
+                  if (starValue <= selectedValue) {
+                      s.classList.add('selected');
+                  } else {
+                      s.classList.remove('selected');
+                  }
+              });
+          });
+      });</script>
+<script>
+    document.getElementById('sortSelect').addEventListener('change', function () {
+        const sortValue = this.value;
+        const productId = '@product.ProductId';
+
+        fetch(`/Products/GetSortedFeedback?productId=${productId}&sort=${sortValue}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('feedback-container').innerHTML = html;
+            });
+    });
+</script>
