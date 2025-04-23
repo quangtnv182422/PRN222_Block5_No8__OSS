@@ -19,6 +19,8 @@ namespace OSS_Main.Repository.Interface
 
         Task<List<Product>> GetProductByCondition(FilterProductDTO filterProductDTO);
         Task<long> GetTotalProductByCondition(FilterProductDTO filterProductDTO);
+        void AddReview(Feedback feedback);
+        Task<List<Feedback>> GetReviews(int? productId);
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
     }
 }

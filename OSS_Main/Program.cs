@@ -25,6 +25,7 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 //Product
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
 //Order
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderService, OrderService>();

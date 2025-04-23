@@ -20,6 +20,10 @@ namespace OSS_Main.Service.Interface
         Task<List<Product>> SearchProduct(FilterProductDTO filterProductDTO);
         Task<long> GetTotalProduct(FilterProductDTO filterProductDTO);
         void RemoveProduct(int productId);
+        void AddReview(Feedback fb);
+        Task<List<Feedback>> GetReviews(int? productId);
+
+
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
     }
 }

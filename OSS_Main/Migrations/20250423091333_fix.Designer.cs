@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OSS_Main.Models.Entity;
 
@@ -11,9 +12,11 @@ using OSS_Main.Models.Entity;
 namespace OSS_Main.Migrations
 {
     [DbContext(typeof(Prn222ProjectContext))]
-    partial class Prn222ProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20250423091333_fix")]
+    partial class fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -273,21 +276,11 @@ namespace OSS_Main.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
 
-                    b.Property<decimal>("BasePrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int?>("CartId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("PriceEachItem")
                         .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductSpecId")
                         .HasColumnType("int")
@@ -295,13 +288,6 @@ namespace OSS_Main.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
-
-                    b.Property<decimal?>("SalePrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("SpecName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CartItemId");
 
@@ -442,8 +428,6 @@ namespace OSS_Main.Migrations
 
                     b.HasKey("OrderId");
 
-                    b.HasIndex("OrderStatusId");
-
                     b.HasIndex(new[] { "CustomerId" }, "IX_Orders_CustomerId");
 
                     b.HasIndex(new[] { "ReceiverId" }, "IX_Orders_ReceiverId");
@@ -477,28 +461,6 @@ namespace OSS_Main.Migrations
                     b.HasIndex(new[] { "OrderId" }, "IX_OrderItems_OrderId");
 
                     b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("OSS_Main.Models.Entity.OrderStatus", b =>
-                {
-                    b.Property<int>("OrderStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderStatusId"));
-
-                    b.Property<string>("OrderDisplay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OrderStatusName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("OrderStatusId");
-
-                    b.ToTable("OrderStatuses");
                 });
 
             modelBuilder.Entity("OSS_Main.Models.Entity.Product", b =>
@@ -790,12 +752,6 @@ namespace OSS_Main.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId");
 
-                    b.HasOne("OSS_Main.Models.Entity.OrderStatus", "OrderStatus")
-                        .WithMany("Orders")
-                        .HasForeignKey("OrderStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("OSS_Main.Models.Entity.ReceiverInformation", "Receiver")
                         .WithMany("Orders")
                         .HasForeignKey("ReceiverId")
@@ -803,8 +759,6 @@ namespace OSS_Main.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-
-                    b.Navigation("OrderStatus");
 
                     b.Navigation("Receiver");
                 });
@@ -920,11 +874,6 @@ namespace OSS_Main.Migrations
             modelBuilder.Entity("OSS_Main.Models.Entity.Order", b =>
                 {
                     b.Navigation("OrderItemOrders");
-                });
-
-            modelBuilder.Entity("OSS_Main.Models.Entity.OrderStatus", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("OSS_Main.Models.Entity.Product", b =>

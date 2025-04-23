@@ -179,6 +179,10 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
                   .WithMany(c => c.ReceiverInformations)  
                   .HasForeignKey(r => r.CustomerId); 
         });
+        modelBuilder.Entity<Media>()
+    .HasOne(m => m.Feedback)
+    .WithMany(f => f.Medias)
+    .HasForeignKey(m => m.FeedbackId);
 
         OnModelCreatingPartial(modelBuilder);
     }
