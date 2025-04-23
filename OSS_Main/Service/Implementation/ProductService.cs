@@ -107,13 +107,7 @@ namespace OSS_Main.Service.Implementation
 		{
 			return await _productRepo.GetTotalProductByCondition(filterProductDTO);
 		}
-	}
-        public async Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages)
-        {
-            return await _productRepo.AddProductWithImages(product,  SpecName,  SalePrice,  BasePrice,  Quantity,  productImages);
-        }
-
-
+	
         public  void AddReview(Feedback fb)
         {
               _productRepo.AddReview(fb);

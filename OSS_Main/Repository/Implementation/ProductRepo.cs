@@ -270,5 +270,23 @@ namespace OSS_Main.Repository.Implementation
 			}
             return await query.CountAsync();
 		}
-	}
+
+        public void AddReview(Feedback feedback)
+        {
+            feedback.CreatedAt = DateTime.Now;
+            feedback.Status = "Enable";
+            _context.Feedbacks.Add(feedback);
+            _context.SaveChanges();
+        }
+
+        public async Task<List<Feedback>> GetReviews(int? productId)
+        {
+            return await _context.Feedbacks
+    .Where(f => f.ProductId == productId)
+    .Include(f => f.Medias) // nếu muốn kèm theo ảnh/video
+    .Include(f => f.Customer) // nếu muốn kèm theo thông tin người gửi
+    .OrderByDescending(f => f.CreatedAt)
+    .ToListAsync();
+        }
+    }
 }
