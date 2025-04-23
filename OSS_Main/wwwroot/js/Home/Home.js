@@ -1,4 +1,6 @@
 ﻿
+var isCustomer = false;
+
 async function updateCategoryList(data, selectedCategoryId) {
     let contentHtml = ``;
     contentHtml += `
@@ -43,12 +45,18 @@ async function updateProductList(data, isUserAuthenticated) {
                                                     <p class="text-dark fs-5 fw-bold mb-0" style="color: gray; text-decoration: line-through;">${product.productSpecs[0].basePrice} VND</p>
 
                                                     <!--Add to cart-->
-                                                    ${isUserAuthenticated ?
-                                                    
-            `<a href="home/redirectToProductDetails?productId=${product.productId}&specId=${product.productSpecs[0].productSpecId}" class="btn border border-secondary rounded-pill px-3 text-primary"><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>`
-                                                    
-                                                    :
-                                                        `<a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
+                                                   ${isUserAuthenticated && isCustomer ?
+
+                `<btn class="btn border border-secondary rounded-pill px-3 text-primary"
+              data-productId="${product.productId}" data-specId="${product.productSpecs[0].productSpecId}"
+              onclick="handleClickAddToCart(event)"
+                ><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</btn>`
+
+                : !isCustomer ? `<a class="btn border border-secondary rounded-pill px-3 text-danger">
+                                                            <i class="fa fa-shopping-bag me-2 text-danger"></i> Only
+                                                            customers can add to cart
+                                                        </a>` :
+                    `<a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
                                                             <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
                                                         </a>`}
                                                 </div>
@@ -92,10 +100,22 @@ window.onload = async function () {
         });
         if (res.ok) {
             const data = await res.json();
+            isCustomer = data.isCustomer;
             await updateCategoryList(data.categories, data.selectedCategoryId);
             await updateProductList(data.products, data.isUserAuthenticated);
         }
     } catch (error) {
         console.log(error);
     }
+}
+
+function handleClickAddToCart(event) {
+    event.preventDefault();
+    let productId = event.target.getAttribute('data-productId');
+    let specId = event.target.getAttribute('data-specId');
+    if (!isCustomer) {
+        alert('This function is only available for customers');
+        return;
+    }
+    window.location.href = '/home/redirectToProductDetails?productId=' + productId + '&specId=' + specId;
 }

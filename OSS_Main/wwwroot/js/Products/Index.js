@@ -5,6 +5,7 @@
     SearchString: "",
     CategoryId: 0
 }
+var isCustomer = false;
 
 async function updateProductList(data, isUserAuthenticated) {
     let contentHtml = ``;
@@ -25,12 +26,18 @@ async function updateProductList(data, isUserAuthenticated) {
                 <p class="fs-5 fw-bold mb-0" style="color: red;">${product.productSpecs[0].salePrice} VND</p>
                 <p class="fs-5 fw-bold mb-0 text-decoration-line-through text-muted">${product.productSpecs[0].basePrice} VND</p>
 
-                <!--Add to cart-->
-                ${isUserAuthenticated ?
-                `<a href="home/redirectToProductDetails?productId=${product.productId}&specId=${product.productSpecs[0].productSpecId}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                </a>`
-                :
+                                                    <!--Add to cart-->
+                                                    ${isUserAuthenticated && isCustomer ?
+
+            `<btn class="btn border border-secondary rounded-pill px-3 text-primary"
+              data-productId="${product.productId}" data-specId="${product.productSpecs[0].productSpecId}"
+              onclick="handleClickAddToCart(event)"
+                ><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</btn>`
+
+            : !isCustomer ? `<a class="btn border border-secondary rounded-pill px-3 text-danger">
+                                                            <i class="fa fa-shopping-bag me-2 text-danger"></i> Only
+                                                            customers can add to cart
+                                                        </a>` :
                 `<a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
                     <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
                 </a>`}
@@ -109,6 +116,9 @@ async function fetchData() {
         const res = await fetch(`/products/search?searchProduct=${encodeURIComponent(JSON.stringify(searchProductForm))}`);
         if (res.ok) {
             let data = await res.json();
+            console.log(data);
+            isCustomer = data.isCustomer;
+            console.log(isCustomer);
             await updateProductList(data.products, data.isUserAuthenticated);
             await updateCategoryList(data.categories, searchProductForm.CategoryId);
             await updatePagination(searchProductForm.Page, Math.ceil(data.total / searchProductForm.PageSize));
@@ -120,6 +130,17 @@ async function fetchData() {
 
 window.onload = async function () {
     await fetchData();
+}
+
+function handleClickAddToCart(event) {
+    event.preventDefault();
+    let productId = event.target.getAttribute('data-productId');
+    let specId = event.target.getAttribute('data-specId');
+    if (!isCustomer) {
+        alert('This function is only available for customers');
+        return;
+    }
+    window.location.href = '/home/redirectToProductDetails?productId=' + productId + '&specId=' + specId;
 }
 
 async function handleClickCategory(event) {

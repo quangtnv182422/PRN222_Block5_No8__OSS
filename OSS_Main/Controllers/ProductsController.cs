@@ -84,6 +84,7 @@ namespace OSS_Main.Controllers
                 total = total,
 				categories = categories,
                 isUserAuthenticated = User.Identity.IsAuthenticated,
+                isCustomer = User.IsInRole("Customer")
             });
 		}
     }

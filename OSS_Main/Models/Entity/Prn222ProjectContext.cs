@@ -40,7 +40,6 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
 
     public virtual DbSet<ReceiverInformation> ReceiverInformations { get; set; }
 
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

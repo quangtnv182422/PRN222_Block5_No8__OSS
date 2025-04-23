@@ -4,8 +4,7 @@
 
 @{
     ViewData["Title"] = "Home Page";
-    var allProducts = ViewBag.AllProducts as List<OSS_Main.Models.Entity.Product> ?? new List<OSS_Main.Models.Entity.Product>();
-    var allCategories = ViewBag.Categories as List<OSS_Main.Models.Entity.Category> ?? new List<OSS_Main.Models.Entity.Category>();
+    string error = ViewBag.Error as string ?? "";
 }
 
 <!-- Hero Start -->
@@ -56,7 +55,7 @@
 
                 <div class="col-lg-8 text-end">
                     <ul id="navCategoryList" class="nav nav-pills d-inline-flex text-center mb-5">
-                      
+
                     </ul>
                 </div>
 
@@ -70,7 +69,7 @@
                     <div class="row g-4">
                         <div class="col-lg-12">
                             <div class="row g-4" id="listProductSection">
-          
+
                             </div>
                         </div>
                     </div>
@@ -323,6 +322,4 @@
 <!-- Bestsaler Product End -->
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
-<input type="hidden" id="baseURL" value="@Url.Action("Index", "Home", new { categoryId = (int?)null })" />
-<input type="hidden" id="isAuthenticatedUser" value="@(User.Identity.IsAuthenticated)"/>
 <script src="~/js/Home/Home.js" asp-append-version="true"></script>
