@@ -22,6 +22,7 @@ public partial class Feedback
     public DateTime? ModifyAt { get; set; }
 
     public virtual AspNetUser? Customer { get; set; }
+    public ICollection<Media> Medias { get; set; } = new List<Media>();
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
