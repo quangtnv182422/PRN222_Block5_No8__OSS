@@ -117,6 +117,31 @@ namespace OSS_Main.Service.Implementation
         {
             return _productRepo.GetReviews(productId);
         }
-    }
+
+		public async Task<List<Product>> SearchProductForAdmin(FilterProductDTO filterProductDTO)
+		{
+			return await _productRepo.GetProductByConditionForAdmin(filterProductDTO);
+		}
+
+		public async Task<long> GetTotalProductForAdmin(FilterProductDTO filterProductDTO)
+		{
+			return await _productRepo.GetTotalProductByConditionForAdmin(filterProductDTO);
+		}
+
+		public async Task<Product> GetProductDetailById(int productId)
+		{
+			return await _productRepo.GetProductDetailById(productId);
+		}
+
+		public async Task<bool> IsUpdateProductForAdmin(Product product)
+		{
+			return await _productRepo.IsUpdateProductForAdmin(product);
+		}
+
+		public async Task<bool> IsUpdateProductStatusById(int productId, bool status)
+		{
+			return await _productRepo.IsUpdateProductStatusById(productId, status);
+		}
+	}
 
 }

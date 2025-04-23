@@ -27,20 +27,24 @@ async function updateProductList(data, isUserAuthenticated) {
                 <p class="fs-5 fw-bold mb-0 text-decoration-line-through text-muted">${product.productSpecs[0].basePrice} VND</p>
 
                                                     <!--Add to cart-->
-                                                    ${isUserAuthenticated && isCustomer ?
+                                                    ${isUserAuthenticated ? (
+                isCustomer ? `
+        <btn class="btn border border-secondary rounded-pill px-3 text-primary"
+             data-productId="${product.productId}" 
+             data-specId="${product.productSpecs[0].productSpecId}"
+             onclick="handleClickAddToCart(event)">
+            <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+        </btn>`
+                    : `
+        <a class="btn border border-secondary rounded-pill px-3 text-danger">
+            <i class="fa fa-shopping-bag me-2 text-danger"></i> Only customers can add to cart
+        </a>`
+            ) : `
+    <a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
+        <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
+    </a>`
+}
 
-            `<btn class="btn border border-secondary rounded-pill px-3 text-primary"
-              data-productId="${product.productId}" data-specId="${product.productSpecs[0].productSpecId}"
-              onclick="handleClickAddToCart(event)"
-                ><i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</btn>`
-
-            : !isCustomer ? `<a class="btn border border-secondary rounded-pill px-3 text-danger">
-                                                            <i class="fa fa-shopping-bag me-2 text-danger"></i> Only
-                                                            customers can add to cart
-                                                        </a>` :
-                `<a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
-                    <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
-                </a>`}
             </div>
         </div>
     </div>
