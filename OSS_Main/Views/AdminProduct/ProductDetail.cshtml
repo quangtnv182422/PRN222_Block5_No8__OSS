@@ -1,0 +1,114 @@
+﻿@model OSS_Main.Models.DTO.EntityDTO.ProductDTO
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "AccountDetail";
+}
+<main class="page-content bg-light">
+
+    <div class="container-fluid p-4">
+        <div class="layout-specing">
+            <div class="d-md-flex justify-content-between mb-2">
+                <h5 class="mb-0">Product Detail</h5>
+                <nav aria-label="breadcrumb" class="d-inline-block mt-4 mt-sm-0">
+                    <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="@Url.Content("~/index.html")">Admin</a></li>
+                        <li class="breadcrumb-item "><a asp-controller="AdminProduct" asp-action="ProductList">List Product</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Product Detail</li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="card shadow-sm p-4 bg-white rounded">
+                <div class="mb-3 d-flex">
+                    <label class="form-label me-1">Product Name:</label>
+                    <p id="viewProductName">@(Model.ProductName)</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label me-1">Description:</label>
+                    <p id="viewProductDescription">@(Model.Description)</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label me-1">Categories:</label>
+                    <p id="viewProductDescription">
+                        @for (var i = 0; i < Model.ProductCategories.Count; i++)
+                        {
+                            <span>@(Model.ProductCategories[i].Category.Name)</span>
+                            @if (i < Model.ProductCategories.Count - 1)
+                            {
+                                <span>, </span>
+                            }
+                        }
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label me-1">Product Specs:</label>
+                    @if (Model.ProductSpecs != null && Model.ProductSpecs.Count > 0)
+                    {
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Base Price</th>
+                                    <th>Sale Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (var i = 0; i < Model.ProductSpecs.Count; i++)
+                                {
+                                    <tr>
+                                        <td>@(Model.ProductSpecs[i].ProductSpecId)</td>
+                                        <td>@(Model.ProductSpecs[i].SpecName)</td>
+                                        <td>@(Model.ProductSpecs[i].Quantity)</td>
+                                        <td>@(Model.ProductSpecs[i].BasePrice)</td>
+                                        <td>@(Model.ProductSpecs[i].SalePrice)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No product specs found.</p>
+                    }
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Product Images:</label>
+                    @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
+                    {
+                        @for (var i = 0; i < Model.ProductImages.Count; i++)
+                        {
+                            var spec = Model.ProductImages[i];
+                            var carouselId = $"carouselSpec{i}";
+
+                            <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                           @{ var img = spec.ImageUrl;
+                                            var isActive = i == 0 ? "active" : "";
+                                            }
+
+                                            <div class="carousel-item @isActive">
+                                                <img src="@img" class="d-block w-25" alt="Image @(i + 1)">
+                                            </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No product specs found.</p>
+                    } <div id="viewProductImages"></div>
+                </div>
+                <button type="button" class="btn btn-primary" style="width: 5%;" onclick="window.location.href = '@Url.Content("~/AdminProduct/ProductList")'">Back</button>
+            </div>
+        </div>
+    </div>
+</main>

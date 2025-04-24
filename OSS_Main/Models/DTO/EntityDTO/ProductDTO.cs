@@ -14,5 +14,7 @@
 		public List<ProductImageDTO>? ProductImages { get; set; }
 
 		public List<ProductSpecDTO>? ProductSpecs { get; set; }
+
+		public List<ProductCategoryDTO>? ProductCategories { get; set; }
 	}
 }

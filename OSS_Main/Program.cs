@@ -54,6 +54,9 @@ builder.Services.AddScoped<IGhnProxy, GhnApiProxy>();
 builder.Services.AddScoped<IVnPayProxy, VnPayProxy>();
 //PayOS
 builder.Services.AddScoped<IPayosProxy, PayosProxy>();
+//Gemini
+builder.Services.AddHttpClient<GeminiService>();
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<Prn222ProjectContext>(options =>
@@ -76,8 +79,8 @@ builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {
     //options.Password.RequiredLength = 6;
     //options.Password.RequireNonAlphanumeric = false;
-    //options.SignIn.RequireConfirmedAccount = true;
 
+    options.SignIn.RequireConfirmedAccount = true;
     options.Password.RequireDigit = false;                // Không yêu cầu mật khẩu phải chứa số
     options.Password.RequireLowercase = false;            // Không yêu cầu chữ cái thường
     options.Password.RequireUppercase = false;            // Không yêu cầu chữ cái hoa
@@ -165,5 +168,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapHub<CustomerHub>("/notificationHub");
+app.MapHub<ShippingSyncHub>("/shippingHub");
+app.MapHub<OrderHub>("/orderHub");
 
 app.Run();

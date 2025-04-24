@@ -224,5 +224,14 @@ namespace OSS_Main.Service.Implementation
         {
             return await _orderRepo.GetOrderStatusByNameAsync(orderStatusName);
         }
+        public async Task<List<Order>> GetAllOrderByUserReceiverAsync(string userId)
+        {
+            return await _orderRepo.GetAllOrderByUserReceiverAsync(userId);
+        }
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _orderRepo.GetAllOrderStatusAsync();
+
+        }
     }
 }
