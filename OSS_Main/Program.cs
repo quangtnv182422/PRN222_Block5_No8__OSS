@@ -158,5 +158,6 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapHub<CustomerHub>("/notificationHub");
+app.MapHub<ShippingSyncHub>("/shippingHub");
 
 app.Run();

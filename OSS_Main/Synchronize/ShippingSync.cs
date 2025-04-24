@@ -1,5 +1,7 @@
 ﻿using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
 using OSS_Main.Models.Entity;
 using OSS_Main.Proxy.GHN;
@@ -42,6 +44,9 @@ namespace OSS_Main.Synchronize
             {
                 var orderService = scope.ServiceProvider.GetRequiredService<IOrderService>();
                 var ghnService = scope.ServiceProvider.GetRequiredService<IGhnProxy>();
+                var productService = scope.ServiceProvider.GetRequiredService<IProductService>();
+                var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<ShippingSyncHub>>();
+
 
                 var listOrderDetails = await orderService.GetAllOrderShippingAsync();
 
@@ -64,7 +69,15 @@ namespace OSS_Main.Synchronize
                             orderD.OrderStatusId = currentStatus.OrderStatusId;// update lại status như với bên GHN để đồng bộ
                             await orderService.UpdateOrderOnGHNAsync(orderD);
 
+                            //nếu status là cancel thì phải trả lại số lượng vào kho
+                            if (orderDetails.status.Equals("cancel"))
+                            {
+                                await productService.UpdateProductQuantityAfterCancel(orderD.OrderItemOrders);//Trả lại số lượng
+                            }
+
                             //đoạn này dùng signalR để cập nhật realtime
+                            await hubContext.Clients.All.SendAsync("UpdateStatus");
+
                             //nhớ làm thêm luồng khách bom hàng và shipper trả về
                         }
                     }

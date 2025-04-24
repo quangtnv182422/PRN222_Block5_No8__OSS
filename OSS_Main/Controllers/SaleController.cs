@@ -230,7 +230,7 @@ namespace OSS_Main.Controllers
                 {
                     return NotFound("Order not found.");
                 }
-                order.OrderStatusId = 22; //22 là returned order
+                order.OrderStatusId = 26; //26 là confirm_returned 
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
                 return RedirectToAction("Index");

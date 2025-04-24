@@ -77,10 +77,10 @@ namespace OSS_Main.Repository.Implementation
                     .ThenInclude(x => x.ProductSpec)
                     .ThenInclude(x => x.Product)
                     .ThenInclude(x => x.ProductImages)
-                .Where(x => x.OrderStatusId >= 2 && x.OrderStatusId <= 25
+                .Where(x => x.OrderStatusId >= 2 && x.OrderStatusId <= 26
                             && x.OrderStatusId != 6 // đây là status cancel
                             && x.OrderStatusId != 3 // đây là status confirm_received
-                            && x.OrderStatusId != 22) // đây là status returned
+                            && x.OrderStatusId != 26) // đây là status confirm_returned
                 .ToListAsync();
         }
 
