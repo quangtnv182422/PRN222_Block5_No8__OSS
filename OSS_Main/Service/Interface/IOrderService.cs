@@ -11,6 +11,8 @@ namespace OSS_Main.Service.Interface
         Task<List<Order>> GetAllOrderAsync();
         Task<List<Order>> GetAllOrderShippingAsync();
         Task<OrderStatus> GetOrderStatusByNameAsync(string orderStatusName);
+        Task<List<Order>> GetAllOrderByUserReceiverAsync(string userId);
+        Task<List<OrderStatus>> GetAllOrderStatusAsync();
     }
 
 }

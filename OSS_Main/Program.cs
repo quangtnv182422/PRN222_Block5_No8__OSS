@@ -52,6 +52,9 @@ builder.Services.AddScoped<IGhnProxy, GhnApiProxy>();
 builder.Services.AddScoped<IVnPayProxy, VnPayProxy>();
 //PayOS
 builder.Services.AddScoped<IPayosProxy, PayosProxy>();
+//Gemini
+builder.Services.AddHttpClient<GeminiService>();
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<Prn222ProjectContext>(options =>
@@ -158,5 +161,7 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapHub<CustomerHub>("/notificationHub");
+app.MapHub<ShippingSyncHub>("/shippingHub");
+app.MapHub<OrderHub>("/orderHub");
 
 app.Run();
