@@ -18,7 +18,9 @@ using OSS_Main.Synchronize;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+//Feedback
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();
@@ -112,6 +114,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Identity/Account/Login"; // Đường dẫn đến trang đăng nhập
     options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Trang bị từ chối truy cập
 });
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 
 builder.Services.AddControllersWithViews();

@@ -25,5 +25,6 @@ namespace OSS_Main.Service.Interface
 
 
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
+        
     }
 }
