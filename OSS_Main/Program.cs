@@ -77,8 +77,8 @@ builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {
     //options.Password.RequiredLength = 6;
     //options.Password.RequireNonAlphanumeric = false;
-    //options.SignIn.RequireConfirmedAccount = true;
 
+    options.SignIn.RequireConfirmedAccount = true;
     options.Password.RequireDigit = false;                // Không yêu cầu mật khẩu phải chứa số
     options.Password.RequireLowercase = false;            // Không yêu cầu chữ cái thường
     options.Password.RequireUppercase = false;            // Không yêu cầu chữ cái hoa
