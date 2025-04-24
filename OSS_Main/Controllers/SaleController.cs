@@ -169,6 +169,9 @@ namespace OSS_Main.Controllers
                     order.OrderStatusId = 6; //6 là cancel order
                     await _orderService.UpdateOrderOnGHNAsync(order);
                     await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+
+                    await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
                     return RedirectToAction("Index");
                 }
 
@@ -192,6 +195,8 @@ namespace OSS_Main.Controllers
                 order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -212,6 +217,8 @@ namespace OSS_Main.Controllers
                 }
                 order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -233,6 +240,8 @@ namespace OSS_Main.Controllers
                 order.OrderStatusId = 26; //26 là confirm_returned 
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "confirm", order);
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
