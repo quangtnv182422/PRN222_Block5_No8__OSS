@@ -23,10 +23,12 @@ namespace OSS_Main.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICloudinaryProxy _cloudinaryService;
-        public ProductsController(IProductService service, ICloudinaryProxy cloudinaryProxy)
+        private readonly IFeedbackService _feedbackService;
+        public ProductsController(IProductService service, ICloudinaryProxy cloudinaryProxy, IFeedbackService feedbackService)
         {
             _productService = service;
-            _cloudinaryService= cloudinaryProxy;
+            _cloudinaryService = cloudinaryProxy;
+            _feedbackService = feedbackService;
         }
 
         // GET: Products
@@ -37,7 +39,7 @@ namespace OSS_Main.Controllers
         [HttpPost]
         public async Task<IActionResult> AddFeedback(IFormFile? ImageFile, IFormFile? VideoFile, int Rating, string Comment, int ProductId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var feedback = new Feedback
             {
@@ -77,7 +79,7 @@ namespace OSS_Main.Controllers
 
             feedback.Medias = mediaList;
 
-             _productService.AddReview(feedback);
+            _productService.AddReview(feedback);
 
             return RedirectToAction("Details", new { productId = ProductId });
         }
@@ -87,7 +89,7 @@ namespace OSS_Main.Controllers
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? productId, int? specId)
         {
-           
+
             if (productId == null)
             {
                 return NotFound();
@@ -119,6 +121,8 @@ namespace OSS_Main.Controllers
             ViewBag.CurrentPage = 1;
             ViewBag.Sort = "newest";
             ViewBag.ProductId = productId;
+            ViewBag.CurrentCustomerId = User.FindFirstValue(ClaimTypes.NameIdentifier); // nếu dùng Identity
+
 
             ViewBag.FeedBacks = paged;
 
@@ -128,7 +132,7 @@ namespace OSS_Main.Controllers
         [HttpGet]
         [Route("products/search")]
         public async Task<IActionResult> Search(string searchProduct)
-		{
+        {
             FilterProductDTO filter = JsonSerializer.Deserialize<FilterProductDTO>(searchProduct) ?? new();
             //var allProductsWithCategory = filter.CategoryId == null
             //   ? await _productService.GetAllProducts()
@@ -147,11 +151,11 @@ namespace OSS_Main.Controllers
             {
                 products = productsDTO,
                 total = total,
-				categories = categories,
+                categories = categories,
                 isUserAuthenticated = User.Identity.IsAuthenticated,
                 isCustomer = User.IsInRole("Customer")
             });
-		}
+        }
         public async Task<IActionResult> GetSortedFeedback(int? productId, string sort, int page = 1)
         {
             int pageSize = 2; // số feedback mỗi trang
@@ -171,10 +175,66 @@ namespace OSS_Main.Controllers
             ViewBag.CurrentPage = page;
             ViewBag.Sort = sort;
             ViewBag.ProductId = productId;
+            ViewBag.CurrentCustomerId = User.FindFirstValue(ClaimTypes.NameIdentifier); // nếu dùng Identity
+
 
             return PartialView("_FeedbackList", paged);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetFeedback(int id)
+        {
+            var feedback = await _feedbackService.GetFeedbackByIdAsync(id); // bạn cần thêm hàm này trong service
+
+            if (feedback == null || feedback.CustomerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Unauthorized();
+
+            return Json(new
+            {
+                feedbackId = feedback.FeedbackId,
+                feedbackContent = feedback.FeedbackContent,
+                ratedStar = feedback.RatedStar
+            });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditFeedback(int id, [FromBody] Feedback edited)
+        {
+            var feedback = await _feedbackService.GetFeedbackByIdAsync(id);
+            if (feedback == null || feedback.CustomerId != User.FindFirstValue(ClaimTypes.NameIdentifier))
+                return Unauthorized();
+
+            feedback.FeedbackContent = edited.FeedbackContent;
+            feedback.RatedStar = edited.RatedStar;
+
+            await _feedbackService.UpdateFeedbackAsync(feedback);
+
+            return Ok();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFeedback(int feedbackId)
+        {
+            var result = await _feedbackService.DeleteFeedbackAsync(feedbackId);
+            return Json(new { success = result, message = result ? "Feedback deleted successfully" : "Feedback not found" });
+        }
+        [HttpPost]
+        [Route("/Products/DeleteFeedback2")]
+        public async Task<IActionResult> DeleteFeedback2(int id, int productId, int? specId, int currentPage, string sort)
+        {
+            var result = await _feedbackService.DeleteFeedbackAsync(id);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Feedback deleted successfully";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Feedback not found";
+            }
+
+            return RedirectToAction("Details", "Products", new { productId, specId, currentPage, sort });
 
 
+
+        }
     }
 }

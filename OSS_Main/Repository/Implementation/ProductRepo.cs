@@ -282,11 +282,19 @@ namespace OSS_Main.Repository.Implementation
         public async Task<List<Feedback>> GetReviews(int? productId)
         {
             return await _context.Feedbacks
-    .Where(f => f.ProductId == productId)
+    .Where(f => f.ProductId == productId && f.Status.Equals("Enable"))
     .Include(f => f.Medias) // nếu muốn kèm theo ảnh/video
     .Include(f => f.Customer) // nếu muốn kèm theo thông tin người gửi
     .OrderByDescending(f => f.CreatedAt)
     .ToListAsync();
+        }
+
+        public async Task<Feedback> GetFeedbackByIdAsync(int id)
+        {
+            return await _context.Feedbacks
+                .Include(f => f.Customer)
+                .Include(f => f.Medias)
+                .FirstOrDefaultAsync(f => f.FeedbackId == id);
         }
     }
 }
