@@ -113,6 +113,12 @@ namespace OSS_Main.Areas.Identity.Pages.Account
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
 
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Account does not exist.");
+                    return Page();
+                }
+
                 if (user.LockoutEnabled)
                 {
                     ModelState.AddModelError(string.Empty, "User account is locked out.");
@@ -139,7 +145,7 @@ namespace OSS_Main.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Incorrect account and password.");
                     return Page();
                 }
             }
