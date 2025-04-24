@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Ask AI for immediate support";
+}
+
+<h2 class="mb-4">@ViewData["Title"]</h2>
+
+<div class="card shadow-sm p-4 mb-4">
+    <div id="chatContainer" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+        <!-- Tin nhắn sẽ được render ở đây -->
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="userPrompt" class="form-control" placeholder="Enter your question..." />
+        <button id="askBtn" class="btn btn-primary">Ask</button>
+    </div>
+</div>
+
+<script src="~/js/Gemini/mainGemini.js"></script>

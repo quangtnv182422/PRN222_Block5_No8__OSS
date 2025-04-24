@@ -91,5 +91,23 @@ namespace OSS_Main.Repository.Implementation
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<Order>> GetAllOrderByUserReceiverAsync(string userId)
+        {
+            return await _context.Orders
+                .Include(x => x.OrderStatus)
+                .Include(x => x.Receiver)
+                .Include(x => x.OrderItemOrders)
+                .ThenInclude(x => x.CartItem)
+                .ThenInclude(x => x.ProductSpec)
+                .ThenInclude(x => x.Product)
+                .ThenInclude(x => x.ProductImages)
+                .Where(x => x.Receiver.CustomerId.Equals(userId))
+                .ToListAsync();
+        }
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _context.OrderStatuses
+                .ToListAsync();
+        }
     }
 }
