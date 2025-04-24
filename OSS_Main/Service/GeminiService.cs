@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using OSS_Main.Models.Entity;
 using OSS_Main.Service.Interface;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -12,12 +14,18 @@ public class GeminiService
     private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
     private readonly IOrderService _orderService;
-    public GeminiService(HttpClient httpClient, IConfiguration configuration, IUserService userService, IOrderService orderService)
+    private readonly UserManager<AspNetUser> _userManager;
+    public GeminiService(HttpClient httpClient,
+                         IConfiguration configuration,
+                         IUserService userService,
+                         IOrderService orderService,
+                         UserManager<AspNetUser> userManager)
     {
         _httpClient = httpClient;
         _configuration = configuration;
         _userService = userService;
         _orderService = orderService;
+        _userManager = userManager;
     }
 
     public async Task<string> AskGeminiAsync(string userPrompt, HttpContext httpContext)
@@ -116,10 +124,16 @@ public class GeminiService
         var currentUser = await _userService.GetCurrentUserAsync(currentUserId);
 
         var internalIdentity = "";
+
+        //promt data dành cho Customers
         if (currentUser != null)
         {
-            internalIdentity = $@"
-                    Thông tin hệ thống sau khi đã đăng nhập người dùng:
+            var roles = await _userManager.GetRolesAsync(currentUser);
+            if (roles.Contains("Customer"))
+            {
+                internalIdentity = $@"
+                    Đây là
+                    Thông tin hệ thống sau khi đã đăng nhập người dùng với vai trò là Khách hàng (Customer):
                 Website bán hoa quả tên là Fruitable.
 
                  - Đây là thông tin người dùng đang đăng nhập:
@@ -133,30 +147,30 @@ public class GeminiService
                                 ";
 
 
-            var listOrderStatus = await _orderService.GetAllOrderStatusAsync();
-            if (listOrderStatus != null)
-            {
-                internalIdentity += $@"
-                                        Đây là danh sách các trạng thái của order tương ứng với id, name để đánh dấu trạng thái của order đó, display dùng để hiển thị cho user:
-                                        ";
-                foreach (var status in listOrderStatus)
+                var listOrderStatus = await _orderService.GetAllOrderStatusAsync();
+                if (listOrderStatus != null)
                 {
                     internalIdentity += $@"
+                                        Đây là danh sách các trạng thái của order tương ứng với id, name để đánh dấu trạng thái của order đó, display dùng để hiển thị cho user:
+                                        ";
+                    foreach (var status in listOrderStatus)
+                    {
+                        internalIdentity += $@"
                                       -  Order Id : {status.OrderStatusId}
                                       -  Order Name: {status.OrderStatusName}
                                       -  Order Display: {status.OrderDisplay}
                                          
                                         ";
+                    }
                 }
-            }
 
 
-            var orderTracking = await _orderService.GetAllOrderByUserReceiverAsync(currentUserId);
-            if (orderTracking != null)
-            {
-                foreach (var item in orderTracking)
+                var orderTracking = await _orderService.GetAllOrderByUserReceiverAsync(currentUserId);
+                if (orderTracking != null)
                 {
-                    internalIdentity += $@"
+                    foreach (var item in orderTracking)
+                    {
+                        internalIdentity += $@"
                                         Đây là các order của người dùng:
                                       -  Order Id : {item.OrderId}
                                       -  Order Code bên Giao Hàng Nhanh (GHN) : {item.OrderCode_GHN}
@@ -167,12 +181,16 @@ public class GeminiService
                                       -  Order được giao tại địa chỉ : {item.Receiver.Address}, {item.Receiver.WardName_GHN}, {item.Receiver.DistrictName_GHN}, {item.Receiver.ProvinceName_GHN}
                                          
                                         ";
+                    }
                 }
+
+                internalIdentity += " Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng,\r\n      " +
+                    "          và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời.";
             }
 
-            internalIdentity += " Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng,\r\n      " +
-                "          và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời.";
         }
+
+        //promt data dành cho Admin and Sales
 
 
 

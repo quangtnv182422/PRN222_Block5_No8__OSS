@@ -65,3 +65,10 @@ function formatMessage(raw) {
     return html;
 }
 
+// Cho phép nhấn Enter để gửi câu hỏi
+document.getElementById("userPrompt").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Ngăn không cho xuống dòng
+        document.getElementById("askBtn").click(); // Kích hoạt nút Ask
+    }
+});
