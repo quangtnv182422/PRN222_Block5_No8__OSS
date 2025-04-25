@@ -230,7 +230,7 @@ namespace OSS_Main.Repository.Implementation
 				switch (filterProductDTO.SortingCategory)
 				{
 					case "price":
-						query = query.OrderBy(p => p.ProductSpecs.First().BasePrice);
+						query = query.OrderBy(p => p.ProductSpecs.Any() ? p.ProductSpecs.First().SalePrice : decimal.MaxValue);
 						break;
 					default:
 						query = query.OrderBy(p => p.ProductName);
@@ -251,18 +251,6 @@ namespace OSS_Main.Repository.Implementation
 			if (filterProductDTO.CategoryId != 0)
 			{
 				query = query.Where(p => p.ProductCategories.Any(pc => pc.CategoryId == filterProductDTO.CategoryId));
-			}
-			if (!string.IsNullOrEmpty(filterProductDTO.SortingCategory))
-			{
-				switch (filterProductDTO.SortingCategory)
-				{
-					case "price":
-						query = query.OrderBy(p => p.ProductSpecs.First().BasePrice);
-						break;
-					default:
-						query = query.OrderBy(p => p.ProductName);
-						break;
-				}
 			}
 			if (!string.IsNullOrEmpty(filterProductDTO.SearchString))
 			{
