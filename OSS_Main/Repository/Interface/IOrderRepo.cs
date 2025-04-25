@@ -13,5 +13,8 @@ namespace OSS_Main.Repository.Interface
         Task<OrderStatus> GetOrderStatusByNameAsync(string orderStatusName);
         Task<List<Order>> GetAllOrderByUserReceiverAsync(string userId);
         Task<List<OrderStatus>> GetAllOrderStatusAsync();
+        Task<decimal> GetTotalCostsAsync();
+        Task<Dictionary<int, decimal>> GetTotalCostsByMonthAsync(int year);
+        Task<List<int>> GetAllOrderYearsAsync();
     }
 }

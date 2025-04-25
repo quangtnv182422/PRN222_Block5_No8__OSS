@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OSS_Main.Models.Entity;
-using OSS_Main.Repository.Implementation;
 using OSS_Main.Repository.Interface;
 using OSS_Main.Service.Interface;
-using System.Diagnostics;
 using System.Security.Claims;
 
 namespace OSS_Main.Service.Implementation
@@ -207,5 +205,6 @@ namespace OSS_Main.Service.Implementation
             }
             return null;
         }
+        public async Task<long> GetTotalUsersAsync() => await _userRepository.GetTotalUsersAsync();
     }
 }

@@ -1,11 +1,7 @@
-﻿using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
-using OSS_Main.Models.Entity;
 using OSS_Main.Proxy.GHN;
-using OSS_Main.Service.Implementation;
 using OSS_Main.Service.Interface;
 
 namespace OSS_Main.Synchronize

@@ -7,8 +7,6 @@ namespace OSS_Main.Repository.Implementation
 {
 	public class ProductRepo : IProductRepo
 	{
-
-
 		private readonly Prn222ProjectContext _context;
 		public ProductRepo(Prn222ProjectContext context)
 		{
@@ -368,5 +366,7 @@ namespace OSS_Main.Repository.Implementation
                 .Include(f => f.Medias)
                 .FirstOrDefaultAsync(f => f.FeedbackId == id);
         }
+
+		public async Task<long> GetTotalProductTypes() => await _context.Products.LongCountAsync();
     }
 }

@@ -27,5 +27,6 @@ namespace OSS_Main.Repository.Interface
 		Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
         void AddReview(Feedback feedback);
         Task<List<Feedback>> GetReviews(int? productId);
+		Task<long> GetTotalProductTypes();
     }
 }
