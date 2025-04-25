@@ -263,5 +263,28 @@ namespace OSS_Main.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmReceived(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId.ToString());
+                if (order == null)
+                {
+                    return NotFound("Order not found.");
+                }
+
+                order.OrderStatusId = 3; //3 là confirm_received
+                await _orderService.UpdateOrderOnGHNAsync(order);
+                await _hubContext.Clients.All.SendAsync("NewOrder");
+                return RedirectToAction("Index", "Tracking");
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

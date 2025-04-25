@@ -23,13 +23,13 @@ namespace OSS_Main.Controllers
         private readonly IReceiveInforService _receiverService;
 
         public TrackingController(IVnPayProxy vnPayService,
-                              IOrderService orderService,
-                              IProductService productService,
-                              IPayosProxy payOsService,
-                              IConfiguration configuration,
-                              IUserService userService,
-                              IGhnProxy ghnService,
-                              IReceiveInforService receiverService
+                                  IOrderService orderService,
+                                  IProductService productService,
+                                  IPayosProxy payOsService,
+                                  IConfiguration configuration,
+                                  IUserService userService,
+                                  IGhnProxy ghnService,
+                                  IReceiveInforService receiverService
                             )
         {
             _vnPayService = vnPayService;

@@ -80,6 +80,7 @@ namespace OSS_Main.Repository.Implementation
                 .Where(x => x.OrderStatusId >= 2 && x.OrderStatusId <= 26
                             && x.OrderStatusId != 6 // đây là status cancel
                             && x.OrderStatusId != 3 // đây là status confirm_received
+                            && x.OrderStatusId != 14 // đây là status delivered
                             && x.OrderStatusId != 26) // đây là status confirm_returned
                 .ToListAsync();
         }

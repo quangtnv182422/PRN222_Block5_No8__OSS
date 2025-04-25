@@ -13,7 +13,7 @@
     document.getElementById("userPrompt").value = "";
 
     // Loading message
-    const loadingMsg = appendMessage("Gemini", "Thinking...", "text-muted");
+    const loadingMsg = appendMessage("Fruitables AI", "Thinking...", "text-muted");
 
     try {
         const response = await fetch("/api/gemini/ask", {
@@ -28,11 +28,11 @@
 
         // Xóa loading và thêm câu trả lời
         chatContainer.removeChild(loadingMsg);
-        appendMessage("Gemini", result || "No response received.", "bg-light");
+        appendMessage("Fruitables AI", result || "No response received.", "bg-light");
 
     } catch (error) {
         chatContainer.removeChild(loadingMsg);
-        appendMessage("Gemini", `Error: ${error.message}`, "bg-danger text-white");
+        appendMessage("Fruitables AI", `Error: ${error.message}`, "bg-danger text-white");
     }
 });
 

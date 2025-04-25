@@ -1,17 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "Ask AI for immediate support";
+    ViewData["Title"] = "Ask AI for Immediate Support";
 }
 
-<h2 class="mb-4">@ViewData["Title"]</h2>
+<h2 class="mb-4 fw-bold text-primary">@ViewData["Title"]</h2>
 
-<div class="card shadow-sm p-4 mb-4">
-    <div id="chatContainer" class="mb-3" style="max-height: 400px; overflow-y: auto;">
+<div class="card shadow rounded-4 p-4 mb-4 bg-light">
+    <div id="chatContainer" class="mb-4 p-3 bg-white rounded-3 border"
+         style="height: 500px; overflow-y: auto; font-size: 1rem; line-height: 1.6;">
         <!-- Tin nhắn sẽ được render ở đây -->
     </div>
 
     <div class="input-group">
-        <input type="text" id="userPrompt" class="form-control" placeholder="Enter your question..." />
-        <button id="askBtn" class="btn btn-primary">Ask</button>
+        <input type="text" id="userPrompt" class="form-control form-control-lg" placeholder="Enter your question..." />
+        <button id="askBtn" class="btn btn-primary btn-lg px-4">Ask</button>
     </div>
 </div>
 

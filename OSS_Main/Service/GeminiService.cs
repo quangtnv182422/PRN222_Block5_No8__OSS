@@ -116,7 +116,8 @@ public class GeminiService
                 
                 Có 3 phương thức thanh toán là Thanh toán bằng mã QR, Thanh toán bằng vnPay, và COD
 
-                Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng, và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời.
+                Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng,
+                và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời hoặc dùng các kiến thức chung trên mạng để đáp ứng các loại câu hỏi.
                                         "
         ;
 

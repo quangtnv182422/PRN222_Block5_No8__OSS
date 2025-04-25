@@ -36,55 +36,6 @@ namespace OSS_Main.Controllers
         {
             return View();
         }
-        [HttpPost]
-        public async Task<IActionResult> AddFeedback(IFormFile? ImageFile, IFormFile? VideoFile, int Rating, string Comment, int ProductId)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var feedback = new Feedback
-            {
-                CustomerId = userId,
-                FeedbackContent = Comment,
-                RatedStar = Rating,
-                CreatedAt = DateTime.Now,
-                ProductId = ProductId,
-                Status = "Active" // hoặc "Active", tùy theo quy ước
-            };
-
-            var mediaList = new List<Media>();
-
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var imageUrl = await _cloudinaryService.UploadImageAsync(ImageFile);
-                mediaList.Add(new Media
-                {
-                    Url = imageUrl,
-                    PublicId = "", // Nếu Cloudinary trả về publicId thì lưu ở đây
-                    MediaType = MediaType.Image,
-                    CreatedAt = DateTime.Now
-                });
-            }
-
-            if (VideoFile != null && VideoFile.Length > 0)
-            {
-                var videoUrl = await _cloudinaryService.UploadImageAsync(VideoFile);
-                mediaList.Add(new Media
-                {
-                    Url = videoUrl,
-                    PublicId = "", // Tương tự
-                    MediaType = MediaType.Video,
-                    CreatedAt = DateTime.Now
-                });
-            }
-
-            feedback.Medias = mediaList;
-
-            _productService.AddReview(feedback);
-
-            return RedirectToAction("Details", new { productId = ProductId });
-        }
-
-
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? productId, int? specId)
@@ -156,6 +107,62 @@ namespace OSS_Main.Controllers
                 isCustomer = User.IsInRole("Customer")
             });
         }
+
+        //------------------------------------Feedback-------------------------------------------------
+        [HttpGet]
+        public IActionResult FeedbackView(int? productId, int? specId)
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddFeedback(IFormFile? ImageFile, IFormFile? VideoFile, int Rating, string Comment, int ProductId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var feedback = new Feedback
+            {
+                CustomerId = userId,
+                FeedbackContent = Comment,
+                RatedStar = Rating,
+                CreatedAt = DateTime.Now,
+                ProductId = ProductId,
+                Status = "Active" // hoặc "Active", tùy theo quy ước
+            };
+
+            var mediaList = new List<Media>();
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var imageUrl = await _cloudinaryService.UploadImageAsync(ImageFile);
+                mediaList.Add(new Media
+                {
+                    Url = imageUrl,
+                    PublicId = "", // Nếu Cloudinary trả về publicId thì lưu ở đây
+                    MediaType = MediaType.Image,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            if (VideoFile != null && VideoFile.Length > 0)
+            {
+                var videoUrl = await _cloudinaryService.UploadImageAsync(VideoFile);
+                mediaList.Add(new Media
+                {
+                    Url = videoUrl,
+                    PublicId = "", // Tương tự
+                    MediaType = MediaType.Video,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            feedback.Medias = mediaList;
+
+            _productService.AddReview(feedback);
+
+            return RedirectToAction("Details", new { productId = ProductId });
+        }
+
         public async Task<IActionResult> GetSortedFeedback(int? productId, string sort, int page = 1)
         {
             int pageSize = 2; // số feedback mỗi trang
