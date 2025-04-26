@@ -9,6 +9,6 @@ namespace OSS_Main.Repository.Interface
         Task<bool> AddUserAsync(AspNetUser user, string password);
         Task<bool> UpdateUserAsync(AspNetUser user);
         Task<bool> DeleteUserAsync(string userId);
-
+        Task<long> GetTotalUsersAsync();
     }
 }

@@ -1,11 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using OSS_Main.Models.DTO.FilterDTO;
+﻿using OSS_Main.Models.DTO.FilterDTO;
 using OSS_Main.Models.Entity;
 using OSS_Main.Repository.Interface;
 using OSS_Main.Service.Interface;
-using System.Collections.Generic;
-using System.Drawing.Printing;
 
 namespace OSS_Main.Service.Implementation
 {
@@ -142,6 +138,7 @@ namespace OSS_Main.Service.Implementation
 		{
 			return await _productRepo.IsUpdateProductStatusById(productId, status);
 		}
-	}
 
+        public async Task<long> GetTotalProductTypes() => await _productRepo.GetTotalProductTypes();
+    }
 }

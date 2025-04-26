@@ -8,7 +8,6 @@ namespace OSS_Main.Repository.Implementation
 {
     public class UserRepo : IUserRepo
     {
-
         private readonly UserManager<AspNetUser> _userManager;
 
         public UserRepo(UserManager<AspNetUser> userManager)
@@ -107,5 +106,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded;
         }
+
+        public async Task<long> GetTotalUsersAsync() => await _userManager.Users.LongCountAsync();
     }
 }

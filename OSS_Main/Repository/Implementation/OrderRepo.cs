@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OSS_Main.Models.Entity;
-using OSS_Main.Proxy.GHN;
 using OSS_Main.Repository.Interface;
 
 namespace OSS_Main.Repository.Implementation
@@ -12,8 +11,6 @@ namespace OSS_Main.Repository.Implementation
         {
             _context = context;
         }
-
-
         public async Task CreateOrderAsync(Order order)
         {
             _context.Orders.Add(order);
@@ -109,6 +106,37 @@ namespace OSS_Main.Repository.Implementation
         {
             return await _context.OrderStatuses
                 .ToListAsync();
+        }
+
+        public async Task<decimal> GetTotalCostsAsync() => await _context.Orders.SumAsync(o => o.TotalCost);
+
+        public async Task<Dictionary<int, decimal>> GetTotalCostsByMonthAsync(int year)
+        {
+            var monthlyRevenue = await _context.Orders.Where(o => o.OrderAt.Year == year && o.OrderStatusId == 14)
+                                        .GroupBy(o => o.OrderAt.Month)
+                                        .Select(o => new
+                                        {
+                                            Month = o.Key,
+                                            Revenue = o.Sum(or => or.TotalCost)
+                                        })
+                                        .OrderBy(result => result.Month)
+                                        .ToListAsync();
+            Dictionary<int, decimal> mappedMonthRevenue = new Dictionary<int, decimal>();
+            foreach (var item in monthlyRevenue)
+            {
+                mappedMonthRevenue.Add(item.Month, item.Revenue);
+            }
+
+            return mappedMonthRevenue;
+        }
+
+        public async Task<List<int>> GetAllOrderYearsAsync()
+        {
+            return await _context.Orders.Where(o => o.OrderStatusId == 14)
+                                        .Select(o => o.OrderAt.Year)
+                                        .Distinct()
+                                        .OrderBy(year => year)
+                                        .ToListAsync();
         }
     }
 }
