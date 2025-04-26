@@ -63,23 +63,28 @@ namespace OSS_Main.Synchronize
                         var orderRequest = new OrderRequest { order_code = orderD.OrderCode_GHN };
                         var orderDetails = await ghnService.GetOrderDetails(orderRequest);
 
-                        if (!orderDetails.status.Equals(orderD.OrderStatus.OrderStatusName))
+                        if (orderDetails != null)
                         {
-                            var currentStatus = await orderService.GetOrderStatusByNameAsync(orderDetails.status);
-                            orderD.OrderStatusId = currentStatus.OrderStatusId;// update lại status như với bên GHN để đồng bộ
-                            await orderService.UpdateOrderOnGHNAsync(orderD);
-
-                            //nếu status là cancel thì phải trả lại số lượng vào kho
-                            if (orderDetails.status.Equals("cancel"))
+                            if (!orderDetails.status.Equals(orderD.OrderStatus.OrderStatusName))
                             {
-                                await productService.UpdateProductQuantityAfterCancel(orderD.OrderItemOrders);//Trả lại số lượng
+                                var currentStatus = await orderService.GetOrderStatusByNameAsync(orderDetails.status);
+                                orderD.OrderStatusId = currentStatus.OrderStatusId;// update lại status như với bên GHN để đồng bộ
+                                await orderService.UpdateOrderOnGHNAsync(orderD);
+
+                                //nếu status là cancel thì phải trả lại số lượng vào kho
+                                if (orderDetails.status.Equals("cancel"))
+                                {
+                                    await productService.UpdateProductQuantityAfterCancel(orderD.OrderItemOrders);//Trả lại số lượng
+                                }
+
+                                //đoạn này dùng signalR để cập nhật realtime
+                                await hubContext.Clients.All.SendAsync("UpdateStatus");
+
+                                //nhớ làm thêm luồng khách bom hàng và shipper trả về
                             }
-
-                            //đoạn này dùng signalR để cập nhật realtime
-                            await hubContext.Clients.All.SendAsync("UpdateStatus");
-
-                            //nhớ làm thêm luồng khách bom hàng và shipper trả về
                         }
+
+
                     }
                     catch (Exception ex)
                     {
