@@ -33,7 +33,7 @@ public class GeminiService
         var apiKey = _configuration["Gemini:ApiKey"];
         var requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={apiKey}";
 
-        // ✅ Thêm dữ liệu nội bộ của bạn tại đây
+        // Thêm dữ liệu nội bộ của bạn tại đây
         var internalContext = @"
                     Thông tin hệ thống:
                 Website bán hoa quả tên là Fruitable.
@@ -126,10 +126,11 @@ public class GeminiService
 
         var internalIdentity = "";
 
-        //promt data dành cho Customers
         if (currentUser != null)
         {
             var roles = await _userManager.GetRolesAsync(currentUser);
+            //promt data dành cho Customers
+
             if (roles.Contains("Customer"))
             {
                 internalIdentity = $@"
@@ -189,9 +190,84 @@ public class GeminiService
                     "          và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời.";
             }
 
+            //promt data dành cho Admin and Sales
+            if (roles.Contains("Admin"))
+            {
+                internalIdentity = $@"
+                    Đây là
+                    Thông tin hệ thống sau khi đã đăng nhập người dùng với vai trò là Admin :
+                Website bán hoa quả tên là Fruitable.
+
+                 - Đây là thông tin người dùng đang đăng nhập:
+                    - Tên người dùng: {currentUser.UserName}
+                    - Email: {currentUser.Email}
+                    - Phone: {currentUser.PhoneNumber}
+            
+                                ";
+
+
+                var listOrderStatus = await _orderService.GetAllOrderStatusAsync();
+                if (listOrderStatus != null)
+                {
+                    internalIdentity += $@"
+                                        Đây là danh sách các trạng thái của order tương ứng với id, name để đánh dấu trạng thái của order đó, display dùng để hiển thị cho user:
+                                        ";
+                    foreach (var status in listOrderStatus)
+                    {
+                        internalIdentity += $@"
+                                      -  Order Id : {status.OrderStatusId}
+                                      -  Order Name: {status.OrderStatusName}
+                                      -  Order Display: {status.OrderDisplay}
+                                         
+                                        ";
+                    }
+                }
+
+
+                var orderTracking = await _orderService.GetAllOrderAsync();
+                if (orderTracking != null)
+                {
+                    foreach (var item in orderTracking)
+                    {
+                        internalIdentity += $@"
+                                        Đây là các order của người dùng:
+                                      -  Order Id : {item.OrderId}
+                                      -  Order Code bên Giao Hàng Nhanh (GHN) : {item.OrderCode_GHN}
+                                      -  Order được tạo lúc : {item.OrderAt}
+                                      -  Order được thanh toán bằng phương thức : {item.PaymentMethod}
+                                      -  Order có tổng tiền là : {item.TotalCost}
+                                      -  Order đang có trạng thái là : {item.OrderStatus.OrderDisplay}
+                                      -  Order được giao tại địa chỉ : {item.Receiver.Address}, {item.Receiver.WardName_GHN}, {item.Receiver.DistrictName_GHN}, {item.Receiver.ProvinceName_GHN}
+                                         
+                                        ";
+                    }
+                }
+
+
+                var userList = await _userService.GetAllUsersAsync();
+                if (userList != null)
+                {
+                    internalIdentity = $@"Tổng tất cả {userList.Count()} tài khoản trong hệ thống";
+                    foreach (var item in userList)
+                    {
+                        internalIdentity += $@"
+                                        Đây là các thông tin cá nhân của người dùng:
+
+                                      -  User Name  : {item.UserName}
+                                      -  Email : {item.Email}
+                                      - Email Confirmed : {item.EmailConfirmed} nếu là 1 là đã Confirmed rồi, nếu là 2 thì là Chưa Confirmed
+                                     
+                                         
+                                        ";
+                    }
+                }
+                internalIdentity += " Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng,\r\n      " +
+                    "          và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời.";
+            }
+
+
         }
 
-        //promt data dành cho Admin and Sales
 
 
 

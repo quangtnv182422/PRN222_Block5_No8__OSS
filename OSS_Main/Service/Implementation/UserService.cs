@@ -206,5 +206,11 @@ namespace OSS_Main.Service.Implementation
             return null;
         }
         public async Task<long> GetTotalUsersAsync() => await _userRepository.GetTotalUsersAsync();
+
+        public async Task<List<AspNetUser>> GetAllUsersAsync()
+        {
+            return await _userManager.Users.ToListAsync();
+        }
+
     }
 }

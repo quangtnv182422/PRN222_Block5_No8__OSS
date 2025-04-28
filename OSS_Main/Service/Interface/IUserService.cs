@@ -18,6 +18,7 @@ namespace OSS_Main.Service.Interface
         Task<string> AutoCreatePasswords();
         Task<AspNetUser> GetCurrentUserAsync();
         Task<string> GetCurrentUserIdAsync();
-        Task<long> GetTotalUsersAsync(); 
+        Task<long> GetTotalUsersAsync();
+        Task<List<AspNetUser>> GetAllUsersAsync();
     }
 }
