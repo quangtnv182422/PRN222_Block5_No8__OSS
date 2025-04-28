@@ -10,7 +10,7 @@
     var allCategories = ViewBag.Categories as List<OSS_Main.Models.Entity.Category> ?? new List<OSS_Main.Models.Entity.Category>();
 }
 
-@if ( TempData["Error"] != null)
+@if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
@@ -114,13 +114,13 @@
                         @* <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary active"><i class="fa fa-shopping-bag me-2 text-primary active"></i> Add to cart</a>*@
                         @if (User.Identity.IsAuthenticated)
                         {
-                           <form method="post" asp-controller="Cart" asp-action="AddToCart">
-                               <input type="hidden" name="productSpecId" value="@price.ProductSpecId" />
-                               <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm text-center border-0" style="width: 60px;" />
-                               <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
-                                   <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
-                               </button>
-                           </form>
+                            <form method="post" asp-controller="Cart" asp-action="AddToCart">
+                                <input type="hidden" name="productSpecId" value="@price.ProductSpecId" />
+                                <input type="number" name="quantity" value="1" min="1" class="form-control form-control-sm text-center border-0" style="width: 60px;" />
+                                <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
+                                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                                </button>
+                            </form>
                         }
                         else
                         {
@@ -128,7 +128,7 @@
                                 <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
                             </a>
                         }
-                        
+
 
 
                     </div>
@@ -164,43 +164,42 @@
                             </div>
 
                             <!--Reveiew-->
-
                             <!-- Hiển thị danh sách Feedback -->
                             <div class="tab-pane style=" max-height: 500px; overflow-y: auto;"" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
                                 <!-- Form gửi Feedback -->
-                               @* @if (User.Identity.IsAuthenticated)
-                                {
-                                    <form asp-controller="Products" asp-action="AddFeedback" method="post" enctype="multipart/form-data" class="mt-4">
-                                        <input type="hidden" name="ProductId" value="@product.ProductId" />
-                                        <div class="mb-3">
-                                            <label class="form-label">Rating</label>
-                                            <div id="star-rating" class="mb-2">
-                                                @for (int i = 1; i <= 5; i++)
-                                                {
-                                                    <i class="fa fa-star star-icon" data-value="@i"></i>
-                                                }
+                                @* @if (User.Identity.IsAuthenticated)
+                                    {
+                                        <form asp-controller="Products" asp-action="AddFeedback" method="post" enctype="multipart/form-data" class="mt-4">
+                                            <input type="hidden" name="ProductId" value="@product.ProductId" />
+                                            <div class="mb-3">
+                                                <label class="form-label">Rating</label>
+                                                <div id="star-rating" class="mb-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <i class="fa fa-star star-icon" data-value="@i"></i>
+                                                    }
+                                                </div>
+                                                <input type="hidden" name="Rating" id="ratingInput" value="0" />
                                             </div>
-                                            <input type="hidden" name="Rating" id="ratingInput" value="0" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Comment</label>
-                                            <textarea class="form-control" name="Comment" required></textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Upload Image (optional)</label>
-                                            <input type="file" name="ImageFile" accept="image/*" class="form-control" />
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Upload Video (optional)</label>
-                                            <input type="file" name="VideoFile" accept="video/*" class="form-control" />
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <p class="text-danger">Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to submit feedback.</p>
-                                }*@
+                                            <div class="mb-3">
+                                                <label class="form-label">Comment</label>
+                                                <textarea class="form-control" name="Comment" required></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Upload Image (optional)</label>
+                                                <input type="file" name="ImageFile" accept="image/*" class="form-control" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Upload Video (optional)</label>
+                                                <input type="file" name="VideoFile" accept="video/*" class="form-control" />
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-danger">Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to submit feedback.</p>
+                                    }*@
 
                                 <!--List feedback-->
                                 <h3 class="nav-link border-white border-bottom-0 review-title"> Review</h3>
@@ -220,7 +219,7 @@
 
 
 
-                              
+
                             </div>
 
                         </div>
@@ -305,23 +304,23 @@
 <script src="js/rating.js"></script>
 <script>
     const stars = document.querySelectorAll('.star-icon');
-      const ratingInput = document.getElementById('ratingInput');
+    const ratingInput = document.getElementById('ratingInput');
 
-      stars.forEach(star => {
-          star.addEventListener('click', () => {
-              const selectedValue = parseInt(star.getAttribute('data-value'));
-              ratingInput.value = selectedValue;
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            const selectedValue = parseInt(star.getAttribute('data-value'));
+            ratingInput.value = selectedValue;
 
-              stars.forEach(s => {
-                  const starValue = parseInt(s.getAttribute('data-value'));
-                  if (starValue <= selectedValue) {
-                      s.classList.add('selected');
-                  } else {
-                      s.classList.remove('selected');
-                  }
-              });
-          });
-      });</script>
+            stars.forEach(s => {
+                const starValue = parseInt(s.getAttribute('data-value'));
+                if (starValue <= selectedValue) {
+                    s.classList.add('selected');
+                } else {
+                    s.classList.remove('selected');
+                }
+            });
+        });
+    });</script>
 <script>
     document.getElementById('sortSelect').addEventListener('change', function () {
         const sortValue = this.value;

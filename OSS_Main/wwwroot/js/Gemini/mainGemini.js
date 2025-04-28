@@ -1,4 +1,11 @@
-﻿document.getElementById("askBtn").addEventListener("click", async () => {
+﻿
+// Khi trang web load xong, hiển thị lời chào trong khu vực trả lời
+window.addEventListener("DOMContentLoaded", () => {
+    appendMessage("Fruitables AI", "Bạn có điều gì cần hỏi, hãy hỏi Fruitable AI của chúng tôi", "bg-light");
+});
+
+
+document.getElementById("askBtn").addEventListener("click", async () => {
     const userPrompt = document.getElementById("userPrompt").value.trim();
     const chatContainer = document.getElementById("chatContainer");
 

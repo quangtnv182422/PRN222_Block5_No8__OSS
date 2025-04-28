@@ -140,6 +140,16 @@ else
                                         Pay by vnPay
                                     </button>
                                 </form>
+
+
+                                <form method="post" asp-action="CancelOrder" asp-controller="Order" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <button style="padding: 12px 24px; background-color: #d9291c; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#45a049'" onmouseout="this.style.backgroundColor='#d9291c'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Cancel
+                                    </button>
+                                </form>
                             }
                             else if (order.OrderStatusId == 1 && order.PaymentMethod.Equals("vnPay"))
                             {
@@ -164,10 +174,19 @@ else
                                         Pay by QR
                                     </button>
                                 </form>
+
+                                <form method="post" asp-action="CancelOrder" asp-controller="Order" class="billing-address-form">
+                                    <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
+                                    <button style="padding: 12px 24px; background-color: #d9291c; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#45a049'" onmouseout="this.style.backgroundColor='#d9291c'"
+                                            onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                        Cancel
+                                    </button>
+                                </form>
                             }
                             else if (order.OrderStatusId == 14) //Xác nhận đã nhận được order
                             {
-                                <form method="post" asp-action="Order" asp-controller="ConfirmReceived" class="billing-address-form">
+                                <form method="post" asp-action="ConfirmReceived" asp-controller="Order" class="billing-address-form">
                                     <input type="hidden" class="form-check-input bg-primary border-0" id="orderId" name="orderId" value="@order.OrderId">
 
                                     <button type="submit" style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
@@ -180,7 +199,7 @@ else
                             else if (order.OrderStatusId == 3)  // Buy Again
                             {
                                 <form method="get" asp-action="Details" asp-controller="Products" class="billing-address-form">
-                                    <input type="hidden" name="productId"value="@order.OrderItemOrders.First().CartItem.ProductSpec.ProductId" />
+                                    <input type="hidden" name="productId" value="@order.OrderItemOrders.First().CartItem.ProductSpec.ProductId" />
                                     <button type="submit"
                                             style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
                                             onmouseover="this.style.backgroundColor='#138496'"
