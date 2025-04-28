@@ -25,7 +25,7 @@ namespace OSS_Main.Service.Interface
         Task<List<Product>> SearchProduct(FilterProductDTO filterProductDTO);
         Task<long> GetTotalProduct(FilterProductDTO filterProductDTO);
         void RemoveProduct(int productId);
-        void AddReview(Feedback fb);
+        void AddReview(Feedback fb, int? orderItemId);
         Task<List<Feedback>> GetReviews(int? productId);
 		Task<List<Product>> SearchProductForAdmin(FilterProductDTO filterProductDTO);
 		Task<long> GetTotalProductForAdmin(FilterProductDTO filterProductDTO);

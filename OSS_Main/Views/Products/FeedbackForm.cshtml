@@ -1,0 +1,31 @@
+﻿
+
+<form asp-controller="Products" asp-action="AddFeedback" method="post" enctype="multipart/form-data" class="mt-4">
+
+    <input type="hidden" name="ProductId" value="@ViewBag.ProductId" />
+    <input type="hidden" name="OrderItemId" value="@ViewBag.OrderItemId" />
+
+    <div class="mb-3">
+        <label class="form-label">Rating</label>
+        <div id="star-rating" class="mb-2">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <i class="fa fa-star star-icon" data-value="@i"></i>
+            }
+        </div>
+        <input type="hidden" name="Rating" id="ratingInput" value="0" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Comment</label>
+        <textarea class="form-control" name="Comment" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Upload Image (optional)</label>
+        <input type="file" name="ImageFile" accept="image/*" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Upload Video (optional)</label>
+        <input type="file" name="VideoFile" accept="video/*" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+</form>

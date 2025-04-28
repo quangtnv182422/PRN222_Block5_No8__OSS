@@ -110,13 +110,15 @@ namespace OSS_Main.Controllers
 
         //------------------------------------Feedback-------------------------------------------------
         [HttpGet]
-        public IActionResult FeedbackView(int? productId, int? specId)
+        public IActionResult FeedbackForm(int? productId, int? orderItemId)
         {
+            ViewBag.ProductId = productId;
+            ViewBag.OrderItemId = orderItemId;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddFeedback(IFormFile? ImageFile, IFormFile? VideoFile, int Rating, string Comment, int ProductId)
+        public async Task<IActionResult> AddFeedback(IFormFile? ImageFile, IFormFile? VideoFile, int Rating, string Comment, int ProductId, int OrderItemId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -158,7 +160,7 @@ namespace OSS_Main.Controllers
 
             feedback.Medias = mediaList;
 
-            _productService.AddReview(feedback);
+            _productService.AddReview(feedback, OrderItemId);
 
             return RedirectToAction("Details", new { productId = ProductId });
         }

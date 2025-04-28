@@ -341,12 +341,24 @@ namespace OSS_Main.Repository.Implementation
 			return true;
 		}
 
-        public void AddReview(Feedback feedback)
+        public void AddReview(Feedback feedback , int? orderItemId)
         {
             feedback.CreatedAt = DateTime.Now;
             feedback.Status = "Enable";
             _context.Feedbacks.Add(feedback);
             _context.SaveChanges();
+
+			//Gán feedback vừa add cho orderitem luôn
+            if (orderItemId.HasValue)
+            {
+                var orderItem = _context.OrderItems.FirstOrDefault(oi => oi.OrderItemId == orderItemId.Value);
+                if (orderItem != null)
+                {
+                    orderItem.FeedbackId = feedback.FeedbackId;
+                    _context.SaveChanges(); 
+                }
+            }
+
         }
 
         public async Task<List<Feedback>> GetReviews(int? productId)

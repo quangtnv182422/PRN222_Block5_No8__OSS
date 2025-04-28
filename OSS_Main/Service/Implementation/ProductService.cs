@@ -104,9 +104,9 @@ namespace OSS_Main.Service.Implementation
 			return await _productRepo.GetTotalProductByCondition(filterProductDTO);
 		}
 	
-        public  void AddReview(Feedback fb)
+        public  void AddReview(Feedback fb, int? orderItemId)
         {
-              _productRepo.AddReview(fb);
+              _productRepo.AddReview(fb, orderItemId);
         }
 
         public Task<List<Feedback>> GetReviews(int? productId)

@@ -168,7 +168,7 @@
                             <!-- Hiển thị danh sách Feedback -->
                             <div class="tab-pane style=" max-height: 500px; overflow-y: auto;"" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
                                 <!-- Form gửi Feedback -->
-                                @if (User.Identity.IsAuthenticated)
+                               @* @if (User.Identity.IsAuthenticated)
                                 {
                                     <form asp-controller="Products" asp-action="AddFeedback" method="post" enctype="multipart/form-data" class="mt-4">
                                         <input type="hidden" name="ProductId" value="@product.ProductId" />
@@ -200,7 +200,7 @@
                                 else
                                 {
                                     <p class="text-danger">Please <a asp-area="Identity" asp-page="/Account/Login">login</a> to submit feedback.</p>
-                                }
+                                }*@
 
                                 <!--List feedback-->
                                 <h3 class="nav-link border-white border-bottom-0 review-title"> Review</h3>

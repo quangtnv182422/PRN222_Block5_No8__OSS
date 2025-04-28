@@ -25,7 +25,7 @@ namespace OSS_Main.Repository.Interface
 		Task<long> GetTotalProductByConditionForAdmin(FilterProductDTO filterProductDTO);
 		Task<long> GetTotalProductByCondition(FilterProductDTO filterProductDTO);
 		Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
-        void AddReview(Feedback feedback);
+        void AddReview(Feedback feedback, int? orderItemId);
         Task<List<Feedback>> GetReviews(int? productId);
 		Task<long> GetTotalProductTypes();
     }
