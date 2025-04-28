@@ -139,7 +139,6 @@ using (var scope = app.Services.CreateScope())
     await SeedData.SeedRolesAsync(roleManager);
 }
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -170,5 +169,6 @@ app.MapRazorPages();
 app.MapHub<CustomerHub>("/notificationHub");
 app.MapHub<ShippingSyncHub>("/shippingHub");
 app.MapHub<OrderHub>("/orderHub");
+app.MapHub<AdminHub>("/adminHub");
 
 app.Run();

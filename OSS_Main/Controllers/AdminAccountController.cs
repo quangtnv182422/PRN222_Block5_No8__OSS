@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using OSS_Main.Hubs;
 using OSS_Main.Models.Entity;
 using OSS_Main.Service.Interface;
 
@@ -12,12 +14,13 @@ namespace OSS_Main.Controllers
         private readonly IUserService _userService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IEmailService _emailService;
-
-        public AdminAccountController(IUserService userService, UserManager<AspNetUser> userManager, IEmailService emailService)
+        private readonly IHubContext<AdminHub> _adminHubContext;
+        public AdminAccountController(IUserService userService, UserManager<AspNetUser> userManager, IEmailService emailService, IHubContext<AdminHub> adminHubContext)
         {
             _userService = userService;
             _userManager = userManager;
             _emailService = emailService;
+            _adminHubContext = adminHubContext;
         }
 
         public async Task<IActionResult> AccountList(string searchQuery, string roleFilter, string statusFilter, int page = 1, int pageSize = 10)
@@ -77,13 +80,15 @@ namespace OSS_Main.Controllers
         {
             if (string.IsNullOrWhiteSpace(userInput.UserName) || string.IsNullOrWhiteSpace(userInput.Email))
             {
-                return Json(new { success = false, message = "Username, Email are required." });
+                TempData["Error"] = "Username, Email are required. Try again.";
+                return RedirectToAction("AccountList");
             }
 
             var existingUser = await _userManager.FindByEmailAsync(userInput.Email);
             if (existingUser != null)
             {
-                return Json(new { success = false, message = "User with this email already exists." });
+                TempData["Error"] = "User with this email already exists. Try again.";
+                return RedirectToAction("AccountList");
             }
 
             string password = await _userService.AutoCreatePasswords();
@@ -106,15 +111,16 @@ namespace OSS_Main.Controllers
             if (result)
             {
                 await _emailService.SendWelcomeEmail(userInput.Email, userInput.UserName, password);
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
                 return RedirectToAction("AccountList");
             }
             else
             {
-                return Json(new { success = false, message = "Failed to add user." });
+                TempData["Error"] = "Failed to add user.";
+                return RedirectToAction("AccountList");
             }
         }
 
-        // Xóa user (lỗi không xóa đc, sửa sau)
         [HttpPost]
         public async Task<IActionResult> UpdateUserStatus(string Id, bool LockoutEnabled)
         {
@@ -126,11 +132,13 @@ namespace OSS_Main.Controllers
             bool success = await _userService.UpdateUserStatus(Id, LockoutEnabled);
             if (success)
             {
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
                 return RedirectToAction("AccountList");
             }
             else
             {
-                return Json(new { success = false, message = "Failed to delete user. User may not exist." });
+                TempData["Error"] = "User may not exist.";
+                return RedirectToAction("AccountList");
             }
         }
 
@@ -159,9 +167,15 @@ namespace OSS_Main.Controllers
                 return BadRequest("Failed to update user roles.");
 
             if (isUserUpdated)
+            {
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
                 return RedirectToAction("AccountDetail", new { id = existingUser.Id });
+            }
             else
-                return BadRequest(new { success = false, message = "Failed to update user." });
+            {
+                TempData["Error"] = "Failed to update user.";
+                return RedirectToAction("AccountDetail", new { id = existingUser.Id });
+            }
         }
         public IActionResult Index()
         {
