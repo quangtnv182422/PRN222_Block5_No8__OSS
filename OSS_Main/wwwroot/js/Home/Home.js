@@ -69,6 +69,9 @@ async function updateProductList(data, isUserAuthenticated) {
                                     </div>
                                     `;
     }
+    if(data.length === 0) {
+        contentHtml += `<h3>No product found <sup class="text-danger">*</sup></h3>`;
+    }
     document.getElementById('listProductSection').innerHTML = contentHtml;
 }
 

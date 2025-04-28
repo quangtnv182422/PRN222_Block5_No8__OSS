@@ -7,36 +7,38 @@
 
 async function updatePagination(page, totalPage) {
     let contentHtml = ``;
-    contentHtml += `<div class="pagination d-flex justify-content-center mt-5">
+    if (totalPage > 0) {
+        contentHtml += `<div class="pagination d-flex justify-content-center mt-5">
             <li class="page-item">
                 <span class="page-link" data-value="1" onclick="handleClickPage(event)">Start</span>
             </li>`;
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + (page > 1 ? page - 1 : 1) + `" onclick="handleClickPage(event)">Previous</span>
         </li>`;
 
-    for (let i = 1; i <= totalPage; i++) {
-        if (i === 1 || i === totalPage || (i >= page - 2 && i <= page + 2)) {
-            contentHtml += `<li class="page-item ` + (i === page ? 'active' : '') + `">
+        for (let i = 1; i <= totalPage; i++) {
+            if (i === 1 || i === totalPage || (i >= page - 2 && i <= page + 2)) {
+                contentHtml += `<li class="page-item ` + (i === page ? 'active' : '') + `">
                     <span class="page-link" data-value="` + i + `" onclick="handleClickPage(event)">` + i + `</span>
                 </li>`;
-        } else if (i === page - 3 || i === page + 3) {
-            contentHtml += `<li class="page-item disabled">
+            } else if (i === page - 3 || i === page + 3) {
+                contentHtml += `<li class="page-item disabled">
                     <span class="page-link">...</span>
                 </li>`;
+            }
         }
-    }
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + (page < totalPage ? page + 1 : totalPage) + `" onclick="handleClickPage(event)">Next</span>
         </li>`;
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + totalPage + `" onclick="handleClickPage(event)">End</span>
         </li>`;
 
-    contentHtml += `</div>`;
+        contentHtml += `</div>`;
+    }
     document.getElementById('paginationSection').innerHTML = contentHtml
 }
 
@@ -84,6 +86,7 @@ ${isUserAuthenticated && product.productStatus ? `
                                     </tr>
         `;
     }
+    if(data.length === 0) contentHtml = `<tr><td colspan="7" class="text-center">No products found.</td></tr>`
     document.getElementById('productTableSection').innerHTML = contentHtml
 }
 

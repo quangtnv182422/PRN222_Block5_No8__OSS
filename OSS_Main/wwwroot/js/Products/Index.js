@@ -43,7 +43,7 @@ async function updateProductList(data, isUserAuthenticated) {
     <a href="/home/redirectToLoginPage" class="btn border border-secondary rounded-pill px-3 text-danger">
         <i class="fa fa-shopping-bag me-2 text-danger"></i> Please login to add to cart
     </a>`
-}
+            }
 
             </div>
         </div>
@@ -51,6 +51,9 @@ async function updateProductList(data, isUserAuthenticated) {
 </div>
 
                                     `;
+    }
+    if (data.length == 0) {
+        contentHtml += `<h3>No product found <sup class="text-danger">*</sup></h3>`;
     }
     document.getElementById('productListSection').innerHTML = contentHtml;
 }
@@ -60,9 +63,9 @@ async function updateCategoryList(data, selectedCategoryId) {
     contentHtml += `
       <li class="nav-item">
                             <button class="d-flex justify-content-between fruite-name border-0 bg-transparent " value="0"
-                            onclick="handleClickCategory(event)"
+                            onclick="handleClickCategory(event)" style="${selectedCategoryId === 0 ? 'color: #EAA23E' : 'color:green'}"
                             >
-                                 <i class="fas fa-apple-alt me-2 ${selectedCategoryId === 0 ? 'active' : ''}"></i>Tất cả
+                                 <i class="fas fa-apple-alt me-2"></i>Tất cả
                             </button>
                         </li>
     `;
@@ -70,9 +73,9 @@ async function updateCategoryList(data, selectedCategoryId) {
         contentHtml += `
       <li class="nav-item">
                                 <button class="d-flex justify-content-between fruite-name border-0 bg-transparent " value="${category.categoryId}"
-                                 onclick="handleClickCategory(event)"
+                                 onclick="handleClickCategory(event)" style="${selectedCategoryId === category.categoryId ? 'color: #EAA23E' : 'color:green'}"
                                 >
-                                    <i class="fas fa-apple-alt me-2 pt-2 ${selectedCategoryId === category.categoryId ? 'active' : ''}"></i>${category.name}
+                                    <i class="fas fa-apple-alt me-2 pt-2"></i>${category.name}
                                 </button>
                             </li>
         `;
@@ -82,36 +85,38 @@ async function updateCategoryList(data, selectedCategoryId) {
 
 async function updatePagination(page, totalPage) {
     let contentHtml = ``;
-    contentHtml += `<div class="pagination d-flex justify-content-center mt-5">
+    if (totalPage > 0) {
+        contentHtml += `<div class="pagination d-flex justify-content-center mt-5">
             <li class="page-item">
                 <span class="page-link" data-value="1" onclick="handleClickPage(event)">Start</span>
             </li>`;
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + (page > 1 ? page - 1 : 1) + `" onclick="handleClickPage(event)">Previous</span>
         </li>`;
 
-    for (let i = 1; i <= totalPage; i++) {
-        if (i === 1 || i === totalPage || (i >= page - 2 && i <= page + 2)) {
-            contentHtml += `<li class="page-item ` + (i === page ? 'active' : '') + `">
+        for (let i = 1; i <= totalPage; i++) {
+            if (i === 1 || i === totalPage || (i >= page - 2 && i <= page + 2)) {
+                contentHtml += `<li class="page-item ` + (i === page ? 'active' : '') + `">
                     <span class="page-link" data-value="` + i + `" onclick="handleClickPage(event)">` + i + `</span>
                 </li>`;
-        } else if (i === page - 3 || i === page + 3) {
-            contentHtml += `<li class="page-item disabled">
+            } else if (i === page - 3 || i === page + 3) {
+                contentHtml += `<li class="page-item disabled">
                     <span class="page-link">...</span>
                 </li>`;
+            }
         }
-    }
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + (page < totalPage ? page + 1 : totalPage) + `" onclick="handleClickPage(event)">Next</span>
         </li>`;
 
-    contentHtml += `<li class="page-item">
+        contentHtml += `<li class="page-item">
             <span class="page-link" data-value="` + totalPage + `" onclick="handleClickPage(event)">End</span>
         </li>`;
 
-    contentHtml += `</div>`;
+        contentHtml += `</div>`;
+    }
     document.getElementById('paginationSection').innerHTML = contentHtml
 }
 
