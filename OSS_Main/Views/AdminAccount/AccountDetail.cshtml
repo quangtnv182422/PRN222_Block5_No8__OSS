@@ -87,7 +87,7 @@
                     <button type="button" id="saveButton" class="btn btn-primary d-none" onclick="validate()">
                         <i class="bi bi-floppy"></i><span class="ms-2">Save</span>
                     </button>
-                    <button type="button" id="cancelButton" class="btn btn-secondary d-none" onclick="toggleEditMode()">
+                    <button type="button" id="cancelButton" class="btn btn-secondary d-none" onclick="location.reload()">
                         <i class="bi bi-x"></i><span class="ms-2">Cancel</span>
                     </button>
                 </div>
@@ -112,9 +112,9 @@
     }
 
     function validate(){
-        let username = document.getElementById("username").value;
-        let email = document.getElementById("email").value;
-        let phone = document.getElementById("phone").value;
+        let username = document.getElementById("username").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let phone = document.getElementById("phone").value.trim();
         let dob = document.getElementById("dob").value;
 
         let ul = document.getElementById("errorList");

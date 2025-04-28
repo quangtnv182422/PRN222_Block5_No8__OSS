@@ -112,7 +112,7 @@ namespace OSS_Main.Repository.Implementation
 
         public async Task<Dictionary<int, decimal>> GetTotalCostsByMonthAsync(int year)
         {
-            var monthlyRevenue = await _context.Orders.Where(o => o.OrderAt.Year == year && o.OrderStatusId == 14)
+            var monthlyRevenue = await _context.Orders.Where(o => o.OrderAt.Year == year && (o.OrderStatusId == 14 || o.OrderStatusId == 3))
                                         .GroupBy(o => o.OrderAt.Month)
                                         .Select(o => new
                                         {
@@ -132,7 +132,7 @@ namespace OSS_Main.Repository.Implementation
 
         public async Task<List<int>> GetAllOrderYearsAsync()
         {
-            return await _context.Orders.Where(o => o.OrderStatusId == 14)
+            return await _context.Orders.Where(o => o.OrderStatusId == 14 || o.OrderStatusId == 3)
                                         .Select(o => o.OrderAt.Year)
                                         .Distinct()
                                         .OrderBy(year => year)

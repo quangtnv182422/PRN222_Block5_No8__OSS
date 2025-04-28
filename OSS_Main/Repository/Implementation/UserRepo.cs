@@ -83,7 +83,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded)
             {
-                Debug.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
             return result.Succeeded;
         }
@@ -93,7 +93,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                Debug.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
             return result.Succeeded;
         }

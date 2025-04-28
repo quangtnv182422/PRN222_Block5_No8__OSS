@@ -98,6 +98,7 @@ namespace OSS_Main.Service.Implementation
             {
                 // Log lỗi để biết lỗi gì
                 var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                Console.WriteLine(errors);
                 return false;
             }
             // Kiểm tra nếu role không rỗng, thì gán role
@@ -110,6 +111,7 @@ namespace OSS_Main.Service.Implementation
                     if (!roleCreateResult.Succeeded)
                     {
                         var errors = string.Join(", ", roleCreateResult.Errors.Select(e => e.Description));
+                        Console.WriteLine(errors);
                         return false;
                     }
                 }
@@ -119,6 +121,7 @@ namespace OSS_Main.Service.Implementation
                 if (!addToRoleResult.Succeeded)
                 {
                     var errors = string.Join(", ", addToRoleResult.Errors.Select(e => e.Description));
+                    Console.WriteLine(errors);
                     return false;
                 }
             }

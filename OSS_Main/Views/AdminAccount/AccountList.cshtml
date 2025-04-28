@@ -200,9 +200,9 @@
 </div>
 <script>
     function validate(){
-        let username = document.getElementById("username").value;
-        let email = document.getElementById("email").value;
-        let phone = document.getElementById("phone").value;
+        let username = document.getElementById("username").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let phone = document.getElementById("phone").value.trim();
         let dob = document.getElementById("dob").value;
 
         let ul = document.getElementById("errorList");
