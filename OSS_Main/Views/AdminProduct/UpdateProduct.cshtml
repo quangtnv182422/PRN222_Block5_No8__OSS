@@ -18,7 +18,7 @@
                 </nav>
             </div>
             <div class="card shadow-sm p-4 bg-white rounded">
-                <form asp-controller="AdminProduct" asp-action="UpdateProduct">
+                <form asp-controller="AdminProduct" enctype="multipart/form-data" asp-action="UpdateProduct">
                     <div class="mb-3 d-flex">
                         <label class="form-label me-1 d-flex align-items-center">Product Id:</label>
                         <input type="number" asp-for="ProductId" class="form-control w-50" value="@Model.ProductId" readonly>
@@ -26,10 +26,12 @@
                     <div class="mb-3 d-flex">
                         <label class="form-label me-1 d-flex align-items-center">Product Name:</label>
                         <input type="text" asp-for="ProductName" class="form-control w-50" value="@Model.ProductName">
+                        <span class="text-danger" asp-validation-for="ProductName"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label me-1">Description:</label>
                         <textarea class="form-control" asp-for="Description" id="viewDescription" rows="5">@Model.Description</textarea>
+                        <span class="text-danger" asp-validation-for="Description"></span>
                     </div>
                     <div class="mb-3">
                         <label class="form-label me-1">Product Specs:</label>
@@ -50,10 +52,22 @@
                                     {
                                         <tr>
                                             <td><input type="number" asp-for="ProductSpecs[i].ProductSpecId" class="form-control" value="@Model.ProductSpecs[i].ProductSpecId" readonly></td>
-                                            <td><input type="text" asp-for="ProductSpecs[i].SpecName" class="form-control" value="@Model.ProductSpecs[i].SpecName"></td>
-                                            <td><input type="number" asp-for="ProductSpecs[i].Quantity" class="form-control" value="@Model.ProductSpecs[i].Quantity"></td>
-                                            <td><input type="number" asp-for="ProductSpecs[i].BasePrice" class="form-control" value="@Model.ProductSpecs[i].BasePrice"></td>
-                                            <td><input type="number" asp-for="ProductSpecs[i].SalePrice" class="form-control" value="@Model.ProductSpecs[i].SalePrice"></td>
+                                            <td>
+                                                <input type="text" asp-for="ProductSpecs[i].SpecName" class="form-control" value="@Model.ProductSpecs[i].SpecName">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].SpecName"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].Quantity" class="form-control" value="@Model.ProductSpecs[i].Quantity">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].Quantity"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].BasePrice" class="form-control" value="@Model.ProductSpecs[i].BasePrice">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].BasePrice"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].SalePrice" class="form-control" value="@Model.ProductSpecs[i].SalePrice">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].SalePrice"></span>
+                                            </td>
                                         </tr>
                                     }
                                 </tbody>
@@ -65,35 +79,36 @@
                         }
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Product Images:</label>
+                        <label class="form-label">Product Image:</label>
+                        <span class="text-danger" asp-validation-for="ProductImages"></span>
                         @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
                         {
-                            @for (var i = 0; i < Model.ProductImages.Count; i++)
-                            {
-                                var spec = Model.ProductImages[i];
-                                var carouselId = $"carouselSpec{i}";
-
-                                <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
-                                    <div class="carousel-inner">
-                                        @{
-                                            var img = spec.ImageUrl;
-                                            var isActive = i == 0 ? "active" : "";
-                                        }
-
-                                        <div class="carousel-item @isActive">
-                                            <img src="@img" class="d-block w-25" alt="Image @(i + 1)">
-                                        </div>
-                                    </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
-                                    </button>
-                                </div>
-                            }
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Image</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (var i = 0; i < Model.ProductImages.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="number" asp-for="ProductImages[i].ProductImageId" class="form-control" value="@Model.ProductImages[i].ProductImageId" readonly>
+                                            </td>
+                                            <td>
+                                                <img id="imageSection@(i)" src="@Model.ProductImages[i].ImageUrl" class="d-block w-25" alt="Image">
+                                                <span asp-validation-for="ProductImages[i].ImageUrl" class="text-danger"></span>
+                                            </td>
+                                            <td>
+                                                <input type="file" class="form-control" asp-for="ProductImages[i].ImageFile" onchange="previewImage(@i)" id="imageInput@(i)">
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         }
                         else
                         {
@@ -101,6 +116,13 @@
                         } <div id="viewProductImages"></div>
                     </div>
                     <input type="hidden" asp-for="ProductStatus" class="form-control" value="@Model.ProductStatus">
+                    @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
+                    {
+                        @for (var i = 0; i < Model.ProductImages.Count; i++)
+                        {
+                            <input type="hidden" asp-for="ProductImages[i].ImageUrl" class="form-control" value="@Model.ProductImages[i].ImageUrl">
+                        }
+                    }
                     <div class="d-flex">
                         <button type="button" class="btn btn-primary me-2" style="width: 5%;" onclick="window.location.href = '@Url.Content("~/AdminProduct/ProductList")'">Back</button>
                         <button type="submit" class="btn btn-warning" style="width: 15%;">Save Changes</button>
@@ -110,3 +132,17 @@
         </div>
     </div>
 </main>
+<script>
+    function previewImage(index) {
+        var imageInput = document.getElementById("imageInput" + index);
+        var previewImage = document.getElementById("imageSection" + index);
+        var file = imageInput.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

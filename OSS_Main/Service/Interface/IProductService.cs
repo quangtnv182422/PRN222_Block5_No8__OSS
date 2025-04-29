@@ -22,6 +22,8 @@ namespace OSS_Main.Service.Interface
 
         Task<bool> IsUpdateProductStatusById(int productId, bool status);
 
+        Task<bool> IsCreateProductForAdmin(Product product);
+
         Task<List<Product>> SearchProduct(FilterProductDTO filterProductDTO);
         Task<long> GetTotalProduct(FilterProductDTO filterProductDTO);
         void RemoveProduct(int productId);
@@ -31,5 +33,6 @@ namespace OSS_Main.Service.Interface
 		Task<long> GetTotalProductForAdmin(FilterProductDTO filterProductDTO);
         Task<bool> AddProductWithImages(Product product, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<ProductImage> productImages);
         Task<long> GetTotalProductTypes();
+        Task<List<ProductImage>> GetProductImagesByProductId(int productId);
     }
 }

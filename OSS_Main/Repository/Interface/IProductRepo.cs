@@ -20,6 +20,8 @@ namespace OSS_Main.Repository.Interface
 
 		Task<bool> IsUpdateProductForAdmin(Product product);
 		Task<bool> IsUpdateProductStatusById(int productId, bool status);
+
+		Task<bool> IsCreateProductForAdmin(Product product);
 		Task<List<Product>> GetProductByCondition(FilterProductDTO filterProductDTO);
 		Task<List<Product>> GetProductByConditionForAdmin(FilterProductDTO filterProductDTO);
 		Task<long> GetTotalProductByConditionForAdmin(FilterProductDTO filterProductDTO);
@@ -28,5 +30,7 @@ namespace OSS_Main.Repository.Interface
         void AddReview(Feedback feedback, int? orderItemId);
         Task<List<Feedback>> GetReviews(int? productId);
 		Task<long> GetTotalProductTypes();
-    }
+		Task<List<ProductImage>> GetProductImagesByProductId(int productId);
+
+	}
 }

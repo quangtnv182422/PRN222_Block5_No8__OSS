@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OSS_Main.Common;
 using OSS_Main.Models.DTO.EntityDTO;
 using OSS_Main.Models.DTO.FilterDTO;
 using OSS_Main.Models.Entity;
@@ -28,6 +29,56 @@ namespace OSS_Main.Controllers
 		public IActionResult ProductList()
 		{
 			return View();
+		}
+
+		[HttpGet]
+		[Route("adminProduct/createProduct")]
+		public async Task<IActionResult> CreateProductIndex()
+		{
+			ProductDTO product = new ProductDTO();
+			SessionCommon.SetObjectAsSession(HttpContext.Session,"Product", product);
+			ViewBag.Categories = await _categoryService.GetCategoriesAsync().ContinueWith(t => t.Result.Select(c => Mapper.Map<Category, CategoryDTO>(c) ?? new CategoryDTO()).ToList());
+			return View("~/Views/AdminProduct/CreateProduct.cshtml", product);
+		}
+
+
+		[HttpGet]
+		[Route("adminProduct/addSpecRow")]
+		public async Task<IActionResult> AddSpecRow()
+		{
+			ProductDTO product = SessionCommon.GetSessionAsObject<ProductDTO>(HttpContext.Session, "Product") ?? new ProductDTO();
+			product.ProductSpecs.Add(new ProductSpecDTO());
+			SessionCommon.SetObjectAsSession(HttpContext.Session, "Product", product);
+			ViewBag.Categories = await _categoryService.GetCategoriesAsync().ContinueWith(t => t.Result.Select(c => Mapper.Map<Category, CategoryDTO>(c) ?? new CategoryDTO()).ToList());
+			return View("~/Views/AdminProduct/CreateProduct.cshtml", product);
+		}
+		[HttpPost]
+		[Route("adminProduct/createProduct")]
+		public async Task<IActionResult> CreateProduct(ProductDTO productDTO, [FromForm] List<IFormFile> productImages, [FromForm] List<int> categoryIds)
+		{
+			bool isValid = ModelState.IsValid;
+			if (!isValid) return View("~/Views/AdminProduct/CreateProduct.cshtml", productDTO);
+			foreach (var image in productImages)
+			{
+				var cloudinaryUrl = await _cloudinaryService.UploadImageAsync(image);
+				productDTO.ProductImages.Add(new ProductImageDTO() { ImageUrl = cloudinaryUrl });
+			}
+			foreach(var catId in categoryIds)
+			{
+				productDTO.ProductCategories.Add(new ProductCategoryDTO() { CategoryId = catId });
+			}
+			Product product = Mapper.Map<ProductDTO, Product>(productDTO) ?? new Product();
+			bool isCreated = await _productService.IsCreateProductForAdmin(product);
+			if (isCreated)
+			{
+				TempData["SuccessMessage"] = "Product created successfully.";
+				return RedirectToAction("ProductList");
+			}
+			else
+			{
+				TempData["ErrorMessage"] = "Failed to update product.";
+				return View("~/Views/AdminProduct/CreateProduct.cshtml", product);
+			}
 		}
 
 		[HttpGet]
@@ -128,7 +179,23 @@ namespace OSS_Main.Controllers
 		[HttpPost]
 		public async Task<IActionResult> UpdateProduct(ProductDTO product)
 		{
+			bool isValid = ModelState.IsValid;
+			if(!isValid) return View("~/Views/AdminProduct/UpdateProduct.cshtml", product);
 			Product? product1 = Mapper.Map<ProductDTO, Product>(product);
+			if (product1 != null && product.ProductImages != null)
+			{
+				for(int i = 0; i < product.ProductImages.Count; i++)
+				{
+					var image = product.ProductImages[i];
+					if (image.ImageFile == null || string.IsNullOrEmpty(image.ImageUrl)) continue;
+					var formFileHash = UtilHelper.ComputeSha256Hash(UtilHelper.GetBytesFromIFormFile(image.ImageFile));
+					var cloudinaryHash = UtilHelper.ComputeSha256Hash(await UtilHelper.DownloadFileAsBytesAsync(image.ImageUrl));
+					if (formFileHash != cloudinaryHash)
+					{
+						product1.ProductImages.ElementAt(i).ImageUrl = await _cloudinaryService.UploadImageAsync(image.ImageFile);
+					}
+				}
+			}
 			bool isUpdated = product1 != null ? await _productService.IsUpdateProductForAdmin(product1) : false;
 			if (isUpdated)
 			{
@@ -190,34 +257,5 @@ namespace OSS_Main.Controllers
 			}
 			return RedirectToAction("ProductList");
 		}
-
-		[HttpPost]
-		public async Task<IActionResult> AddProduct(Product model, string SpecName, decimal SalePrice, decimal BasePrice, int Quantity, List<IFormFile> ProductImages)
-		{
-
-			if (!ModelState.IsValid)
-			{
-				return Json(new { success = false });
-
-			}
-
-			model.CreatedAt = DateTime.Now;
-			List<ProductImage> uploadedImages = new List<ProductImage>();
-			if (ProductImages != null && ProductImages.Count > 0)
-			{
-				foreach (var image in ProductImages)
-				{
-					string imageUrl = await _cloudinaryService.UploadImageAsync(image);
-					if (!string.IsNullOrEmpty(imageUrl))
-					{
-						uploadedImages.Add(new ProductImage { ImageUrl = imageUrl });
-					}
-				}
-			}
-
-			bool isAdded = await _productService.AddProductWithImages(model, SpecName, SalePrice, BasePrice, Quantity, uploadedImages);
-			return Json(new { success = isAdded });
-		}
-
 	}
 }

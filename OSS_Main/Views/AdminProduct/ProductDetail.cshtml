@@ -3,6 +3,40 @@
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "AccountDetail";
 }
+<style>
+    .carousel-item {
+        position: relative;
+    }
+
+        .carousel-item a {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+            background: linear-gradient(rgba(255, 181, 36, 0.7), rgba(255, 181, 36, 0.7));
+        }
+
+    .carousel-control-next,
+    .carousel-control-prev {
+        width: 48px;
+        height: 48px;
+        border-radius: 48px;
+        border: 1px solid var(--bs-white);
+        background: var(--bs-primary);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .carousel-control-next {
+        margin-right: 20px;
+    }
+
+    .carousel-control-prev {
+        margin-left: 20px;
+    }
+</style>
 <main class="page-content bg-light">
 
     <div class="container-fluid p-4">
@@ -76,39 +110,31 @@
                     <label class="form-label">Product Images:</label>
                     @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
                     {
-                        @for (var i = 0; i < Model.ProductImages.Count; i++)
-                        {
-                            var spec = Model.ProductImages[i];
-                            var carouselId = $"carouselSpec{i}";
-
-                            <div id="@carouselId" class="carousel slide" data-bs-ride="carousel">
-                                <div class="carousel-inner">
-                                           @{ var img = spec.ImageUrl;
-                                            var isActive = i == 0 ? "active" : "";
-                                            }
-
-                                            <div class="carousel-item @isActive">
-                                                <img src="@img" class="d-block w-25" alt="Image @(i + 1)">
-                                            </div>
-                                </div>
-                                <button class="carousel-control-prev" type="button" data-bs-target="#@carouselId" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#@carouselId" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
+                        <div id="productImageCarousel" class="carousel slide mt-3 w-25" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                @foreach (var image in Model.ProductImages)
+                                {
+                                    <div class="carousel-item @((image == Model.ProductImages.FirstOrDefault()) ? "active" : "")">
+                                        <img src="@image.ImageUrl" class="d-block w-100" alt="Thumbnail">
+                                    </div>
+                                }
                             </div>
-                        }
+                            <!-- Previous và Next Buttons -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productImageCarousel" data-bs-slide="prev" style="color: black">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productImageCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            </button>
+                        </div>
                     }
                     else
                     {
-                        <p>No product specs found.</p>
+                    <p>No product specs found.</p>
                     } <div id="viewProductImages"></div>
-                </div>
-                <button type="button" class="btn btn-primary" style="width: 5%;" onclick="window.location.href = '@Url.Content("~/AdminProduct/ProductList")'">Back</button>
             </div>
+            <button type="button" class="btn btn-primary" style="width: 10%;" onclick="window.location.href = '@Url.Content("~/AdminProduct/ProductList")'">Back</button>
         </div>
+    </div>
     </div>
 </main>

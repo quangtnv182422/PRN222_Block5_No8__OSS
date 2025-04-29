@@ -301,7 +301,10 @@ namespace OSS_Main.Repository.Implementation
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
-				Product? existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == product.ProductId);
+				Product? existingProduct = await _context.Products.
+					Include(p => p.ProductSpecs)
+					.Include(p => p.ProductImages)
+					.FirstOrDefaultAsync(p => p.ProductId == product.ProductId);
 				if (existingProduct == null) throw new Exception();
 				existingProduct.ProductName = product.ProductName;
 				existingProduct.Description = product.Description;
@@ -313,6 +316,13 @@ namespace OSS_Main.Repository.Implementation
 					existingSpec.BasePrice = spec.BasePrice;
 					existingSpec.SalePrice = spec.SalePrice;
 					existingSpec.Quantity = spec.Quantity;
+				}
+				if(existingProduct.ProductImages != null && product.ProductImages != null)
+				{
+					for(int i = 0; i < existingProduct.ProductImages.Count; i++)
+					{
+						existingProduct.ProductImages.ElementAt(i).ImageUrl = product.ProductImages.ElementAt(i).ImageUrl;
+					}
 				}
 				await _context.SaveChangesAsync();
 				await transaction.CommitAsync();
@@ -380,5 +390,45 @@ namespace OSS_Main.Repository.Implementation
         }
 
 		public async Task<long> GetTotalProductTypes() => await _context.Products.LongCountAsync();
-    }
+
+		public async Task<List<ProductImage>> GetProductImagesByProductId(int productId)
+		{
+			return await _context.ProductImages.Where(p => p.ProductId == productId).ToListAsync();
+		}
+
+		public async Task<bool> IsCreateProductForAdmin(Product product)
+		{
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				_context.Products.Add(product);	
+				await _context.SaveChangesAsync();
+				foreach (ProductSpec spec in product.ProductSpecs)
+				{
+					spec.ProductId = product.ProductId;
+					_context.ProductSpecs.Add(spec);
+				}
+
+
+				foreach (ProductImage image in product.ProductImages)
+				{
+					image.ProductId = product.ProductId;
+					_context.ProductImages.Add(image);
+				}
+				foreach (ProductCategory category in product.ProductCategories)
+				{
+					category.ProductId = product.ProductId;
+					_context.ProductCategories.Add(category);
+				}
+				await _context.SaveChangesAsync();
+				await transaction.CommitAsync();
+			}
+			catch (Exception ex)
+			{
+				await transaction.RollbackAsync();
+				return false;
+			}
+			return true;
+		}
+	}
 }

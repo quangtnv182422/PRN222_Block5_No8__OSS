@@ -140,5 +140,15 @@ namespace OSS_Main.Service.Implementation
 		}
 
         public async Task<long> GetTotalProductTypes() => await _productRepo.GetTotalProductTypes();
-    }
+
+		public async Task<List<ProductImage>> GetProductImagesByProductId(int productId)
+		{
+			return await _productRepo.GetProductImagesByProductId(productId);
+		}
+
+		public async Task<bool> IsCreateProductForAdmin(Product product)
+		{
+			return await _productRepo.IsCreateProductForAdmin(product);
+		}
+	}
 }
