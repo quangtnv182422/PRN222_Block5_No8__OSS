@@ -401,24 +401,32 @@ namespace OSS_Main.Repository.Implementation
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
+				product.CreatedAt = DateTime.Now;
+				product.ProductStatus = true;
 				_context.Products.Add(product);	
 				await _context.SaveChangesAsync();
 				foreach (ProductSpec spec in product.ProductSpecs)
 				{
-					spec.ProductId = product.ProductId;
-					_context.ProductSpecs.Add(spec);
+					await _context.Database.ExecuteSqlRawAsync("Insert into ProductSpecs(SpecName, Quantity, BasePrice, SalePrice, ProductId, ProductStatus) values({0}, {1}, {2}, {3}, {4}, {5})", new object[]
+					{
+						spec.SpecName,
+						spec.Quantity,
+						spec.BasePrice,
+						spec.SalePrice,
+						product.ProductId,
+						1
+					});
 				}
 
 
 				foreach (ProductImage image in product.ProductImages)
 				{
-					image.ProductId = product.ProductId;
-					_context.ProductImages.Add(image);
+					await _context.Database.ExecuteSqlRawAsync("Insert into ProductImages(ProductId, ImageURL) Values({0}, {1})",
+						new object[] { product.ProductId, image.ImageUrl });
 				}
 				foreach (ProductCategory category in product.ProductCategories)
 				{
-					category.ProductId = product.ProductId;
-					_context.ProductCategories.Add(category);
+					await _context.Database.ExecuteSqlRawAsync("Insert into ProductCategories(ProductId, CategoryId) values({0}, {1})", new object[] { product.ProductId, category.CategoryId });
 				}
 				await _context.SaveChangesAsync();
 				await transaction.CommitAsync();
