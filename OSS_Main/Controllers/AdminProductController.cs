@@ -59,8 +59,9 @@ namespace OSS_Main.Controllers
 			if (!isValid) return View("~/Views/AdminProduct/CreateProduct.cshtml", productDTO);
 			foreach (var image in productImages)
 			{
-				var cloudinaryUrl = await _cloudinaryService.UploadImageAsync(image);
-				productDTO.ProductImages.Add(new ProductImageDTO() { ImageUrl = cloudinaryUrl });
+				//var cloudinaryUrl = await _cloudinaryService.UploadImageAsync(image);
+				//productDTO.ProductImages.Add(new ProductImageDTO() { ImageUrl = cloudinaryUrl });
+				productDTO.ProductImages.Add(new ProductImageDTO() { ImageUrl = "abc" });
 			}
 			foreach(var catId in categoryIds)
 			{
@@ -76,7 +77,8 @@ namespace OSS_Main.Controllers
 			else
 			{
 				TempData["ErrorMessage"] = "Failed to update product.";
-				return View("~/Views/AdminProduct/CreateProduct.cshtml", product);
+				ViewBag.Categories = await _categoryService.GetCategoriesAsync().ContinueWith(t => t.Result.Select(c => Mapper.Map<Category, CategoryDTO>(c) ?? new CategoryDTO()).ToList());
+				return View("~/Views/AdminProduct/CreateProduct.cshtml", productDTO);
 			}
 		}
 
