@@ -1,8 +1,7 @@
 ﻿using OSS_Main.Models.DTO.EntityDTO;
-using OSS_Main.Utils;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSS_Main.Validations
+namespace OSS_Main.Utils
 {
 	public class NoDuplicateImageAttribute : ValidationAttribute
 	{

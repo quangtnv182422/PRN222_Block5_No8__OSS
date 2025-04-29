@@ -1,4 +1,4 @@
-﻿using OSS_Main.Validations;
+﻿using OSS_Main.Utils;
 using System.ComponentModel.DataAnnotations;
 
 namespace OSS_Main.Models.DTO.EntityDTO

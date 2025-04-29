@@ -1,7 +1,7 @@
 ﻿using OSS_Main.Models.DTO.EntityDTO;
 using System.ComponentModel.DataAnnotations;
 
-namespace OSS_Main.Validations
+namespace OSS_Main.Utils
 {
 	public class SalePriceLessThanBasePriceAttribute : ValidationAttribute
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace OSS_Main.Common
+namespace OSS_Main.Utils
 {
 	public static class SessionCommon
 	{
