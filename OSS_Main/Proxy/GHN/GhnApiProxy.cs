@@ -143,5 +143,47 @@ namespace OSS_Main.Proxy.GHN
                 return false; 
             }
         }
+
+    /*    public async Task<string> GetOrderDetails(OrderRequest order)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            var json = JsonSerializer.Serialize(order, options);
+
+            var response = await _httpClient.PostAsync($"{_ghnSettings.BaseUrl}{_ghnSettings.Endpoints.OrderDetail}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+            return await response.Content.ReadAsStringAsync();
+        }*/
+
+        public async Task<GHNOrderDetails> GetOrderDetails(OrderRequest order)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var json = JsonSerializer.Serialize(order, options);
+
+            var response = await _httpClient.PostAsync(
+                $"{_ghnSettings.BaseUrl}{_ghnSettings.Endpoints.OrderDetail}",
+                new StringContent(json, Encoding.UTF8, "application/json"));
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            // Deserialize phần "data" trong response nếu GHN bọc dữ liệu trong field "data"
+            using var document = JsonDocument.Parse(responseContent);
+            if (document.RootElement.TryGetProperty("data", out var dataElement))
+            {
+                var details = JsonSerializer.Deserialize<GHNOrderDetails>(dataElement.GetRawText(), options);
+                return details;
+            }
+
+            // Trường hợp response không có field "data"
+            return JsonSerializer.Deserialize<GHNOrderDetails>(responseContent, options);
+        }
+
     }
 }

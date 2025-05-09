@@ -1,0 +1,290 @@
+﻿@using OSS_Main.Models.Entity
+@model IEnumerable<Feedback>
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Feedback List";
+}
+
+<main class="page-content bg-light">
+    @Html.AntiForgeryToken()
+    <div class="top-header">
+        <div class="header-bar d-flex justify-content-between border-bottom">
+            <div class="d-flex align-items-center">
+                <a href="#" class="logo-icon">
+                    <img src="@Url.Content("~/assets/images/logo-icon.png")" height="30" class="small" alt="Logo">
+                    <span class="big">
+                        <img src="@Url.Content("~/assets/images/logo-dark.png")" height="24" class="logo-light-mode" alt="Logo">
+                        <img src="@Url.Content("~/assets/images/logo-light.png")" height="24" class="logo-dark-mode" alt="Logo">
+                    </span>
+                </a>
+                <a id="close-sidebar" class="btn btn-icon btn-pills btn-soft-primary ms-2" href="#">
+                    <i class="uil uil-bars"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="layout-specing">
+            <div class="d-md-flex justify-content-between">
+                <h5 class="mb-0">Feedback List</h5>
+                <nav aria-label="breadcrumb" class="d-inline-block mt-4 mt-sm-0">
+                    <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="@Url.Content("~/index.html")">Admin</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Feedback List</li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mt-4">
+                    <div class="table-responsive shadow rounded">
+                        <table class="table table-centered bg-white mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "FeedbackId", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">ID</a>
+                                    </th>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "ProductId", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">Product ID</a>
+                                    </th>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "CustomerId", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">Customer</a>
+                                    </th>
+                                    <th class="border-bottom p-3">Feedback Content</th>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "RatedStar", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">Rated Star</a>
+                                    </th>
+                                    <th class="border-bottom p-3">Images</th>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "CreatedAt", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">Created At</a>
+                                    </th>
+                                    <th class="border-bottom p-3">
+                                        <a href="@Url.Action("FeedbackList", "AdminFeedback", new { sortBy = "Status", sortOrder = ViewBag.SortOrder == "asc" ? "desc" : "asc" })">Status</a>
+                                    </th>
+                                    <th class="border-bottom p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var feedback in Model)
+                                {
+                                    <tr>
+                                        <td class="p-3">@feedback.FeedbackId</td>
+                                        <td class="p-3">@feedback.ProductId</td>
+                                        <td class="p-3">@(feedback.Customer?.UserName ?? "Unknown")</td>
+                                        <td class="p-3">@(feedback.FeedbackContent?.Length > 50 ? feedback.FeedbackContent.Substring(0, 50) + "..." : feedback.FeedbackContent ?? "N/A")</td>
+                                        <td class="p-3">@(feedback.RatedStar ?? 0)</td>
+                                        <td class="p-3">
+                                            @if (feedback.Medias != null && feedback.Medias.Any(m => m.MediaType == MediaType.Image))
+                                            {
+                                                var firstImage = feedback.Medias.First(m => m.MediaType == MediaType.Image);
+                                                <img src="@firstImage.Url" alt="Feedback Image" width="50" height="50" class="img-thumbnail" />
+                                            }
+                                            else
+                                            {
+                                                <span>No Image</span>
+                                            }
+                                        </td>
+                                        <td class="p-3">@feedback.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td class="p-3">@feedback.Status</td>
+                                        <td class="p-3 text-end">
+                                            <button class="btn btn-icon btn-pills btn-soft-primary view-feedback" data-id="@feedback.FeedbackId" data-bs-toggle="modal" data-bs-target="#viewFeedbackModal">
+                                                <i class="uil uil-eye"></i>
+                                            </button>
+                                            <select class="form-select change-status" data-id="@feedback.FeedbackId">
+                                                @foreach (var status in ViewBag.FeedbackStatuses)
+                                                {
+                                                    var optionHtml = $"<option value=\"{status.Value}\"{(feedback.Status == status.Value ? " selected" : "")}>{status.Text}</option>";
+                                                    @Html.Raw(optionHtml)
+                                                }
+                                            </select>
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                <button class="btn btn-icon btn-pills btn-soft-danger delete-feedback" data-id="@feedback.FeedbackId">
+                                                    <i class="uil uil-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Feedback Modal -->
+            <div class="modal fade" id="viewFeedbackModal" tabindex="-1" aria-labelledby="viewFeedbackModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewFeedbackModalLabel">View Feedback</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Feedback ID:</label>
+                                <p id="viewFeedbackId"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Product ID:</label>
+                                <p id="viewFeedbackProductId"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Customer:</label>
+                                <p id="viewFeedbackCustomerId"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Feedback Content:</label>
+                                <p id="viewFeedbackContent"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Rated Star:</label>
+                                <p id="viewFeedbackRatedStar"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Images:</label>
+                                <div id="viewFeedbackImages">
+                                    <span>No Images</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Created At:</label>
+                                <p id="viewFeedbackCreatedAt"></p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status:</label>
+                                <p id="viewFeedbackStatus"></p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="row text-center">
+                <div class="col-12 mt-4">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("FeedbackList", "AdminFeedback", new { page = ViewBag.CurrentPage - 1, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder })">Prev</a>
+                        </li>
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("FeedbackList", "AdminFeedback", new { page = i, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("FeedbackList", "AdminFeedback", new { page = ViewBag.CurrentPage + 1, sortBy = ViewBag.SortBy, sortOrder = ViewBag.SortOrder })">Next</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // View Feedback
+        $(document).on("click", ".view-feedback", function () {
+            var feedbackId = $(this).data("id");
+            $.ajax({
+                url: '@Url.Action("GetFeedback", "AdminFeedback")',
+                type: 'GET',
+                data: { id: feedbackId },
+                success: function (response) {
+                    if (response.success && response.feedback) {
+                        $("#viewFeedbackId").text(response.feedback.feedbackId);
+                        $("#viewFeedbackProductId").text(response.feedback.productId);
+                        $("#viewFeedbackCustomerId").text(response.feedback.customer ? response.feedback.customer.userName : "Unknown");
+                        $("#viewFeedbackContent").text(response.feedback.feedbackContent || "N/A");
+                        $("#viewFeedbackRatedStar").text(response.feedback.ratedStar || 0);
+                        $("#viewFeedbackCreatedAt").text(response.feedback.createdAt);
+                        $("#viewFeedbackStatus").text(response.feedback.status);
+
+                        // Hiển thị danh sách ảnh trong modal
+                        var imageContainer = $("#viewFeedbackImages");
+                        imageContainer.empty();
+                        if (response.feedback.medias && response.feedback.medias.length > 0) {
+                            var images = response.feedback.medias.filter(function(media) {
+                                return media.mediaType === 1; // Chỉ lấy ảnh (MediaType.Image)
+                            });
+                            if (images.length > 0) {
+                                images.forEach(function(media) {
+                                    imageContainer.append('<img src="' + media.url + '" class="img-thumbnail me-2" width="100" height="100" alt="Feedback Image"/>');
+                                });
+                            } else {
+                                imageContainer.html('<span>No Images</span>');
+                            }
+                        } else {
+                            imageContainer.html('<span>No Images</span>');
+                        }
+
+                        $('#viewFeedbackModal').modal('show');
+                    } else {
+                        alert("Feedback not found.");
+                    }
+                },
+                error: function () {
+                    alert("Error fetching feedback.");
+                }
+            });
+        });
+
+        // Change Status
+        $(".change-status").change(function () {
+            var select = $(this);
+            var feedbackId = select.data("id");
+            var newStatus = select.val();
+            $.ajax({
+                url: '@Url.Action("ChangeFeedbackStatus", "AdminFeedback")',
+                type: 'POST',
+                headers: {
+                    RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: { feedbackId: feedbackId, status: newStatus },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert("Failed to change status: " + response.message);
+                    }
+                },
+                error: function () {
+                    alert("Error changing status.");
+                }
+            });
+        });
+
+        // Delete Feedback
+        $(".delete-feedback").click(function () {
+            var feedbackId = $(this).data("id");
+            if (confirm("Are you sure you want to delete this feedback?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteFeedback", "AdminFeedback")',
+                    type: 'POST',
+                    headers: {
+                        RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    data: { id: feedbackId },
+                    success: function (response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert("Failed to delete feedback: " + response.message);
+                        }
+                    },
+                    error: function () {
+                        alert("Error deleting feedback.");
+                    }
+                });
+            }
+        });
+    });
+</script>

@@ -8,7 +8,6 @@ namespace OSS_Main.Repository.Implementation
 {
     public class UserRepo : IUserRepo
     {
-
         private readonly UserManager<AspNetUser> _userManager;
 
         public UserRepo(UserManager<AspNetUser> userManager)
@@ -46,9 +45,9 @@ namespace OSS_Main.Repository.Implementation
 
             var users = await query.ToListAsync();
 
-            // Nếu có lọc Role, phải gọi GetRolesAsync để kiểm tra user nào có role đó
             if (!string.IsNullOrEmpty(roleFilter))
             {
+                // Lọc role theo filter
                 var filteredUsers = new List<AspNetUser>();
 
                 foreach (var user in users)
@@ -61,8 +60,22 @@ namespace OSS_Main.Repository.Implementation
                 }
                 return filteredUsers;
             }
-            return users;
+            else
+            {
+                //Lọc role khác Admin
+                var notAdminUser = new List<AspNetUser>();
 
+                foreach (var user in users)
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (!roles.Contains("Admin"))
+                    {
+                        notAdminUser.Add(user);
+                    }
+                }
+
+                return notAdminUser;
+            }
         }
 
         public async Task<bool> AddUserAsync(AspNetUser user, string password)
@@ -70,7 +83,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.CreateAsync(user, password);
             if (!result.Succeeded)
             {
-                Debug.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
             return result.Succeeded;
         }
@@ -80,7 +93,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                Debug.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine($"[DEBUG] Failed to add user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
             return result.Succeeded;
         }
@@ -93,5 +106,7 @@ namespace OSS_Main.Repository.Implementation
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded;
         }
+
+        public async Task<long> GetTotalUsersAsync() => await _userManager.Users.LongCountAsync();
     }
 }

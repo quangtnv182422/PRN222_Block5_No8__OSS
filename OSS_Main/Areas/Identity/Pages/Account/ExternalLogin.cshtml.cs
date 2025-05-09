@@ -27,7 +27,7 @@ namespace OSS_Main.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<AspNetUser> _signInManager;
         private readonly UserManager<AspNetUser> _userManager;
-       // private readonly IUserStore<AspNetUser> _userStore;
+        // private readonly IUserStore<AspNetUser> _userStore;
         //private readonly IUserEmailStore<AspNetUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
@@ -45,7 +45,7 @@ namespace OSS_Main.Areas.Identity.Pages.Account
         {
             _signInManager = signInManager;
             _userManager = userManager;
-           // _userStore = userStore;
+            // _userStore = userStore;
             //_emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
@@ -53,23 +53,23 @@ namespace OSS_Main.Areas.Identity.Pages.Account
             _cartService = cartService;
         }
 
- 
+
         [BindProperty]
         public InputModel Input { get; set; }
 
-      
+
         public string ProviderDisplayName { get; set; }
 
-   
+
         public string ReturnUrl { get; set; }
 
-     
+
         [TempData]
         public string ErrorMessage { get; set; }
- 
+
         public class InputModel
         {
-             
+
             [Required]
             [EmailAddress]
             public string Email { get; set; }
@@ -160,6 +160,13 @@ namespace OSS_Main.Areas.Identity.Pages.Account
             }
             else
             {
+                //Kiểm tra nếu bị khóa tài khoản
+                if (user.LockoutEnabled)
+                {
+                    TempData["ErrorMessage"] = "User account locked out.";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                }
+
                 // Nếu người dùng đã có tài khoản, đăng nhập ngay
                 var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 

@@ -2,128 +2,103 @@
 
 @{
     Layout = "_LayoutAdmin";
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Order Tracking";
 }
 
-<h1>Order Tracking</h1>
+<h1 class="mt-4 mb-4 text-primary">📦 Order Tracking</h1>
 
-
-<table class="table">
-    <thead>
+<table class="table table-hover table-bordered align-middle">
+    <thead class="table-dark">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderCode_GHN)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentMethod)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-
-            <th>
-                @Html.DisplayNameFor(model => model.OrderStatusId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalCost)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Receiver)
-            </th>
-            <th></th>
+            <th>@Html.DisplayNameFor(model => model.OrderCode_GHN)</th>
+            <th>@Html.DisplayNameFor(model => model.OrderAt)</th>
+            <th>@Html.DisplayNameFor(model => model.PaymentMethod)</th>
+            <th>@Html.DisplayNameFor(model => model.Notes)</th>
+            <th>Status</th>
+            <th>@Html.DisplayNameFor(model => model.TotalCost)</th>
+            <th>@Html.DisplayNameFor(model => model.Receiver)</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
+            var statusClass = item.OrderStatusId switch
+            {
+                1 => "badge bg-warning text-dark", // Pending
+                2 => "badge bg-info",              // Confirmed
+                4 or 5 or 7 => "badge bg-primary", // Shipping-related
+                6 => "badge bg-danger",            // Canceled
+                22 => "badge bg-secondary",        // Returning
+                26 => "badge bg-success",          // Returned
+                _ => "badge bg-light text-dark"
+            };
+
             <tr>
+                <td>@Html.DisplayFor(modelItem => item.OrderCode_GHN)</td>
+                <td>@item.OrderAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.PaymentMethod</td>
+                <td>@item.Notes</td>
+                <td><span class="@statusClass">@item.OrderStatus?.OrderDisplay</span></td>
+                <td>@item.TotalCost.ToString("N0") ₫</td>
+                <td>@item.Receiver?.FullName</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.OrderCode_GHN)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OrderAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PaymentMethod)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Notes)
-                </td>
-                <td>
-                    @{
-                        string status = string.Empty;
-                        if (item.OrderStatusId == 1)
+                    <div class="btn-group" role="group">
+                        @if (item.OrderStatusId == 1)
                         {
-                            status = "Pending Confirmation";
+                            <a class="btn btn-sm btn-primary" title="Confirm Order"
+                               href="@Url.Action("ConfirmOrder", "Sale", new { orderId = item.OrderId })">
+                                ✔️ Confirm
+                            </a>
+                            <a class="btn btn-sm btn-danger" title="Cancel Order"
+                               href="@Url.Action("CancelOrder", new { orderId = item.OrderId })">
+                                ❌ Cancel
+                            </a>
                         }
-                        else if (item.OrderStatusId == 2)
+                        else if (item.OrderStatusId is 2 or 4 or 5 or 7)
                         {
-                            status = "Confirmed";
+                            <a class="btn btn-sm btn-success" title="Print Order"
+                               href="@Url.Action("PrintOrder", "Sale", new { orderCode_GHN = item.OrderCode_GHN })">
+                                🖨️ Print
+                            </a>
+                            @if (!string.IsNullOrEmpty(item.OrderCode_GHN))
+                            {
+                                <a class="btn btn-sm btn-danger" title="Cancel GHN Order"
+                                   href="@Url.Action("CancelOrderGHN", "Sale", new { orderId = item.OrderId, orderId_GHN = item.OrderCode_GHN })">
+                                    ❌ Cancel
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-danger" title="Cancel after Confirm"
+                                   href="@Url.Action("CancelOrderAfterConfirm", new { orderId = item.OrderId })">
+                                    ❌ Cancel
+                                </a>
+                            }
                         }
-                        else
+                        else if (item.OrderStatusId == 22)
                         {
-                            status = "Canceled";
+                            <a class="btn btn-sm btn-success" title="Confirm Returned"
+                               href="@Url.Action("ConfirmReturned", "Sale", new { orderId = item.OrderId })">
+                                🔄 Confirm Returned
+                            </a>
                         }
-                    }
-
-                    @Html.DisplayFor(modelItem => status)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TotalCost)
-                </td>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.Receiver.FullName)
-                </td>
-                <td>
-                    @if (item.OrderStatusId == 1)
-                    {
-                        <button class="btn btn-primary btn-sm"
-                                onclick="window.location.href='@Url.Action("ConfirmOrder", "Sale", new { orderId = item.OrderId })'">
-                            Confirm
-                        </button>
-                        <button class="btn btn-danger btn-sm"
-                                onclick="window.location.href='@Url.Action("CancelOrder", new { orderId = item.OrderId })'">
-                            Cancel Order
-                        </button>
-                    }
-                    else if (item.OrderStatusId == 2)
-                    {
-                        <button class="btn btn-success btn-sm"
-                                onclick="window.location.href='@Url.Action("PrintOrder", "Sale", new { orderCode_GHN = item.OrderCode_GHN })'">
-                            Print Order
-                        </button>
-                        if (item.OrderCode_GHN != null)
+                        else if (item.OrderStatusId == 26)
                         {
-                            <button class="btn btn-danger btn-sm"
-                                    onclick="window.location.href='@Url.Action("CancelOrderGHN", "Sale", new { orderId = item.OrderId, orderId_GHN = item.OrderCode_GHN })'">
-                                Cancel Order
-                            </button>
+                            <span class="text-success fw-bold">✅ Returned</span>
                         }
-                        else
+                        else if (item.OrderStatusId == 6)
                         {
-                            <button class="btn btn-danger btn-sm"
-                                    onclick="window.location.href='@Url.Action("CancelOrderAfterConfirm", new { orderId = item.OrderId })'">
-                                Cancel Order
-                            </button>
+                            <span class="text-danger fw-bold">❌ Canceled</span>
                         }
-
-                    }
-                    else
-                    {
-                        <div class="text-danger font-weight-bold">
-                            The order is canceled.
-                        </div>
-                    }
+                    </div>
                 </td>
-
             </tr>
         }
     </tbody>
 </table>
-<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+
+<!-- SignalR for Realtime -->
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script src="~/js/hub.js"></script>
+<script src="~/js/Hubs/shippingHub.js"></script>
+<script src="~/js/Hubs/orderHub.js"></script>   

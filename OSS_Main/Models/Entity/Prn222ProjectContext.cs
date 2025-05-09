@@ -30,6 +30,8 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
+    public virtual DbSet<OrderStatus> OrderStatuses { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductCategory> ProductCategories { get; set; }
@@ -39,7 +41,6 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
     public virtual DbSet<ProductSpec> ProductSpecs { get; set; }
 
     public virtual DbSet<ReceiverInformation> ReceiverInformations { get; set; }
-
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -127,6 +128,12 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
             entity.HasOne(d => d.Order).WithMany(p => p.OrderItemOrders).HasForeignKey(d => d.OrderId);
 
         });
+        modelBuilder.Entity<OrderStatus>(entity =>
+        {
+            entity.HasKey(e => e.OrderStatusId);
+            entity.Property(e => e.OrderStatusName).HasMaxLength(100).IsRequired();
+        });
+
 
         modelBuilder.Entity<Product>(entity =>
         {
@@ -172,6 +179,10 @@ public partial class Prn222ProjectContext : IdentityDbContext<AspNetUser, AspNet
                   .WithMany(c => c.ReceiverInformations)  
                   .HasForeignKey(r => r.CustomerId); 
         });
+        modelBuilder.Entity<Media>()
+    .HasOne(m => m.Feedback)
+    .WithMany(f => f.Medias)
+    .HasForeignKey(m => m.FeedbackId);
 
         OnModelCreatingPartial(modelBuilder);
     }

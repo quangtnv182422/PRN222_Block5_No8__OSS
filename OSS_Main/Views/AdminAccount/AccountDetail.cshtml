@@ -4,78 +4,94 @@
     Layout = "_LayoutAdmin";
     ViewData["Title"] = "AccountDetail";
 }
-
-<main class="page-content bg-light">
-    <div class="container-fluid">
-        <div class="layout-specing">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">User Details</h5>
-                <a href="@Url.Action("AccountList", "AdminAccount")" class="btn btn-primary">Back to List</a>
-            </div>
-            <div class="card shadow-sm p-4 bg-white rounded">
-                <form id="editUserForm" method="post" action="@Url.Action("UpdateUser", "AdminAccount")">
-                    <input type="hidden" name="Id" value="@Model.Id" />
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">UserName:</label>
-                            <p class="view-mode">@Model.UserName</p>
-                            <input type="text" class="form-control edit-mode d-none" name="UserName" value="@Model.UserName" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Email:</label>
-                            <p class="view-mode">@Model.Email</p>
-                            <input type="email" class="form-control edit-mode d-none" name="Email" value="@Model.Email" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Phone Number:</label>
-                            <p class="view-mode">@Model.PhoneNumber</p>
-                            <input type="text" class="form-control edit-mode d-none" name="PhoneNumber" value="@Model.PhoneNumber" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Address:</label>
-                            <p class="view-mode">@Model.Gender</p>
-                            <input type="text" class="form-control edit-mode d-none" name="Address" value="@(Model.Gender ? "Male" : "Female")" />
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">DOB:</label>
-                            <p class="view-mode">@Model.Dob</p>
-                            <input type="date" class="form-control edit-mode d-none"
-                                   name="DateOfBirth"
-                                   value="@(Model.Dob.ToString("dd-MM-yyyy") )">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Role:</label>
-                            <p class="view-mode">@(Model.Roles.Any() ? string.Join(", ", Model.Roles.Select(r => r.Name)) : "No Role")</p>
-                            <select class="form-select edit-mode d-none" name="newRoles" multiple>
-                                @foreach (var role in ViewBag.AllRoles as List<string>)
-                                {
-                                    bool isSelected = Model.Roles.Any(r => r.Name == role);
-                                    <option value="@role" selected="@(isSelected ? "selected" : null)">@role</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold">Status:</label>
-                            <p class="view-mode">
-                                <span class="badge @(Model.LockoutEnabled ? "bg-danger" : "bg-success")">
-                                    @(Model.LockoutEnabled ? "Locked" : "Active")
-                                </span>
-                            </p>
-                            <select class="form-select edit-mode d-none" name="LockoutEnabled">
-                                <option value="false" selected="@(Model.LockoutEnabled == false)">Active</option>
-                                <option value="true" selected="@(Model.LockoutEnabled == true)">Locked</option>
-                            </select>
+<div class="fw-bold text-danger">@TempData["Error"]</div>
+<main class="bg-light">
+    <div class="p-4">
+        <div class="d-flex justify-content-between pt-3 pb-2">
+            <h1 class="mb-0">User Details</h1>
+            <nav class="d-inline-block mt-4 mt-sm-0">
+                <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
+                    <li class="breadcrumb-item"><a asp-controller="Dashboard" asp-action="">Admin</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="AdminAccount" asp-action="AccountList">User List</a></li>
+                    <li class="breadcrumb-item active">User Details</li>
+                </ul>
+            </nav>
+        </div>
+        <div class="card shadow-sm p-4 bg-white rounded">
+            <form asp-controller="AdminAccount" asp-action="UpdateUser" id="editUserForm" method="post">
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="username">Username</label>
+                        <p class="view-mode">@Model.UserName</p>
+                        <input type="text" id="username" class="form-control edit-mode d-none" asp-for="@Model.UserName" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="email">Email</label>
+                        <p class="view-mode">@Model.Email</p>
+                        <input id="email" class="form-control edit-mode d-none" asp-for="@Model.Email" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="phone">Phone Number</label>
+                        <p class="view-mode">@(Model.PhoneNumber ?? "N/A")</p>
+                        <input id="phone" class="form-control edit-mode d-none" asp-for="@Model.PhoneNumber" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="gender">Gender</label>
+                        <p class="view-mode">@(Model.Gender ? "Male" : "Female")</p>
+                        <div class="edit-mode d-none">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="male" name="Gender" value="true" checked="@(Model.Gender == true)">
+                                <label class="form-check-label" for="male">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="female" name="Gender" value="false" checked="@(Model.Gender == false)">
+                                <label class="form-check-label" for="female">Female</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <button type="button" id="editButton" class="btn btn-soft-success" onclick="toggleEditMode()">
-                            <i class="uil uil-pen"></i> Edit
-                        </button>
-                        <button type="submit" id="saveButton" class="btn btn-primary d-none">Save</button>
-                        <button type="button" id="cancelButton" class="btn btn-secondary d-none" onclick="toggleEditMode()">Cancel</button>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="dob">Date of birth</label>
+                        <p class="view-mode">@(Model.Dob != DateTime.MinValue ? Model.Dob.ToString("dd/MM/yyyy") : "N/A")</p>
+                        <input type="date" class="form-control edit-mode d-none" id="dob"
+                               name="Dob"
+                               value="@(Model.Dob != DateTime.MinValue ? Model.Dob.ToShortDateString() : "")">
                     </div>
-                </form>
-            </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="role">Role</label>
+                        <p class="view-mode">@(Model.Roles.Any() ? string.Join(", ", Model.Roles.Select(r => r.Name)) : "No Role")</p>
+                        <select id="role" class="form-select edit-mode d-none" name="Role">
+                            @foreach (var role in ViewBag.AllRoles as List<string>)
+                            {
+                                bool isSelected = Model.Roles.Any(r => r.Name == role);
+                                <option value="@role" selected="@(isSelected ? "selected" : null)">@role</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="lockout">Status</label>
+                        <span class="badge view-mode @(Model.LockoutEnabled ? "bg-danger" : "bg-success")">
+                            @(Model.LockoutEnabled ? "Locked" : "Active")
+                        </span>
+                        <select id="lockout" class="form-select edit-mode d-none" name="LockoutEnabled">
+                            <option value="false" selected="@(Model.LockoutEnabled == false)">Active</option>
+                            <option value="true" selected="@(Model.LockoutEnabled == true)">Locked</option>
+                        </select>
+                    </div>
+                </div>
+                <ul class="fw-bold text-danger" id="errorList"></ul>
+                <div class="mt-3 fw-bold">
+                    <button type="button" id="editButton" class="btn btn-soft-success" onclick="toggleEditMode()">
+                        <i class="bi bi-pencil"></i><span class="ms-2">Edit</span>
+                    </button>
+                    <button type="button" id="saveButton" class="btn btn-primary d-none" onclick="validate()">
+                        <i class="bi bi-floppy"></i><span class="ms-2">Save</span>
+                    </button>
+                    <button type="button" id="cancelButton" class="btn btn-secondary d-none" onclick="location.reload()">
+                        <i class="bi bi-x"></i><span class="ms-2">Cancel</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </main>
@@ -93,5 +109,36 @@
         editButton.classList.toggle("d-none");
         saveButton.classList.toggle("d-none");
         cancelButton.classList.toggle("d-none");
+    }
+
+    function validate(){
+        let username = document.getElementById("username").value.trim();
+        let email = document.getElementById("email").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let dob = document.getElementById("dob").value;
+
+        let ul = document.getElementById("errorList");
+        ul.innerHTML = "";
+        if(!username){
+            ul.innerHTML += `<li>Username must not empty!</li>`
+        }
+        if(!email){
+            ul.innerHTML += `<li>Email must not empty!</li>`
+        }
+        if(!email.match(/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/)){
+            ul.innerHTML += `<li>Invalid email format!</li>`
+        }
+        if(!phone){
+            ul.innerHTML += `<li>Phone must not empty!</li>`
+        }
+        if(!phone.match(/^\d{10,11}$/)){
+            ul.innerHTML += `<li>Invalid phone format!</li>`
+        }
+        if(!dob){
+            ul.innerHTML += `<li>Date of Birth must not empty!</li>`
+        }
+        if(!ul.innerHTML){
+            document.getElementById("editUserForm").submit();
+        }
     }
 </script>

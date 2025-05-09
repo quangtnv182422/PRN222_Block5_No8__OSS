@@ -13,5 +13,7 @@ namespace OSS_Main.Proxy.GHN
         Task<string> GetTokenPrintOrder(OrderRequest order);
         Task<string> PrintOrderAsync(OrderRequest order);
         Task<bool> CancelOrderOnGhnAsync(string orderCode);
+        /*Task<string> GetOrderDetails(OrderRequest order);*/
+        Task<GHNOrderDetails> GetOrderDetails(OrderRequest order);
     }
 }

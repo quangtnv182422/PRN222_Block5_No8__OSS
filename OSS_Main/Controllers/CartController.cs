@@ -6,7 +6,7 @@ using OSS_Main.Service.Interface;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;

@@ -13,17 +13,21 @@ using OSS_Main.Repository.Implementation;
 using OSS_Main.Repository.Interface;
 using OSS_Main.Service.Implementation;
 using OSS_Main.Service.Interface;
+using OSS_Main.Synchronize;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+//Feedback
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 //emailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 //Product
 builder.Services.AddScoped<IProductRepo, ProductRepo>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
 //Order
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -50,6 +54,9 @@ builder.Services.AddScoped<IGhnProxy, GhnApiProxy>();
 builder.Services.AddScoped<IVnPayProxy, VnPayProxy>();
 //PayOS
 builder.Services.AddScoped<IPayosProxy, PayosProxy>();
+//Gemini
+builder.Services.AddHttpClient<GeminiService>();
+
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<Prn222ProjectContext>(options =>
@@ -70,9 +77,15 @@ builder.Services.AddSession(options =>
 
 builder.Services.AddIdentity<AspNetUser, AspNetRole>(options =>
 {
-    options.Password.RequiredLength = 6;
-    options.Password.RequireNonAlphanumeric = false;
+    //options.Password.RequiredLength = 6;
+    //options.Password.RequireNonAlphanumeric = false;
+
     options.SignIn.RequireConfirmedAccount = true;
+    options.Password.RequireDigit = false;                // Không yêu cầu mật khẩu phải chứa số
+    options.Password.RequireLowercase = false;            // Không yêu cầu chữ cái thường
+    options.Password.RequireUppercase = false;            // Không yêu cầu chữ cái hoa
+    options.Password.RequireNonAlphanumeric = false;      // Không yêu cầu ký tự đặc biệt (ví dụ: @, #, !, ...)
+    options.Password.RequiredLength = 6;                  // Yêu cầu mật khẩu có độ dài tối thiểu là 6 ký tự
 
     options.Lockout.AllowedForNewUsers = false;  // Vô hiệu hóa Lockout cho người dùng mới
     options.Lockout.MaxFailedAccessAttempts = 5;  // Số lần thử đăng nhập sai tối đa
@@ -104,11 +117,18 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = "/Identity/Account/Login"; // Đường dẫn đến trang đăng nhập
     options.AccessDeniedPath = "/Identity/Account/AccessDenied"; // Trang bị từ chối truy cập
 });
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddHostedService<ShippingSync>(); // woker service để chạy ngầm các task
+
 
 var app = builder.Build();
 
@@ -118,7 +138,6 @@ using (var scope = app.Services.CreateScope())
 
     await SeedData.SeedRolesAsync(roleManager);
 }
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -148,5 +167,8 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.MapHub<CustomerHub>("/notificationHub");
+app.MapHub<ShippingSyncHub>("/shippingHub");
+app.MapHub<OrderHub>("/orderHub");
+app.MapHub<AdminHub>("/adminHub");
 
 app.Run();

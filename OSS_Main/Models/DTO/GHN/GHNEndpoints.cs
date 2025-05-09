@@ -9,6 +9,8 @@
         public string ShippingFee { get; set; }
         public string CreateOrder { get; set; }
         public string TokenPrint { get; set; }
+        public string OrderDetail { get; set; }
         
+
     }
 }

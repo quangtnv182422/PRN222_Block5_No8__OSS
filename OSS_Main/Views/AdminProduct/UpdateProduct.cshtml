@@ -1,0 +1,148 @@
+﻿@model OSS_Main.Models.DTO.EntityDTO.ProductDTO
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "UpdateProduct";
+}
+<main class="page-content bg-light">
+
+    <div class="container-fluid p-4">
+        <div class="layout-specing">
+            <div class="d-md-flex justify-content-between mb-2">
+                <h5 class="mb-0">Update Product</h5>
+                <nav aria-label="breadcrumb" class="d-inline-block mt-4 mt-sm-0">
+                    <ul class="breadcrumb bg-transparent rounded mb-0 p-0">
+                        <li class="breadcrumb-item"><a href="@Url.Content("~/index.html")">Admin</a></li>
+                        <li class="breadcrumb-item "><a asp-controller="AdminProduct" asp-action="ProductList">List Product</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Update Product</li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="card shadow-sm p-4 bg-white rounded">
+                <form asp-controller="AdminProduct" enctype="multipart/form-data" asp-action="UpdateProduct">
+                    <div class="mb-3 d-flex">
+                        <label class="form-label me-1 d-flex align-items-center">Product Id:</label>
+                        <input type="number" asp-for="ProductId" class="form-control w-50" value="@Model.ProductId" readonly>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <label class="form-label me-1 d-flex align-items-center">Product Name:</label>
+                        <input type="text" asp-for="ProductName" class="form-control w-50" value="@Model.ProductName">
+                        <span class="text-danger" asp-validation-for="ProductName"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label me-1">Description:</label>
+                        <textarea class="form-control" asp-for="Description" id="viewDescription" rows="5">@Model.Description</textarea>
+                        <span class="text-danger" asp-validation-for="Description"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label me-1">Product Specs:</label>
+                        @if (Model.ProductSpecs != null && Model.ProductSpecs.Count > 0)
+                        {
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Base Price</th>
+                                        <th>Sale Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (var i = 0; i < Model.ProductSpecs.Count; i++)
+                                    {
+                                        <tr>
+                                            <td><input type="number" asp-for="ProductSpecs[i].ProductSpecId" class="form-control" value="@Model.ProductSpecs[i].ProductSpecId" readonly></td>
+                                            <td>
+                                                <input type="text" asp-for="ProductSpecs[i].SpecName" class="form-control" value="@Model.ProductSpecs[i].SpecName">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].SpecName"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].Quantity" class="form-control" value="@Model.ProductSpecs[i].Quantity">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].Quantity"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].BasePrice" class="form-control" value="@Model.ProductSpecs[i].BasePrice">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].BasePrice"></span>
+                                            </td>
+                                            <td>
+                                                <input type="number" asp-for="ProductSpecs[i].SalePrice" class="form-control" value="@Model.ProductSpecs[i].SalePrice">
+                                                <span class="text-danger" asp-validation-for="ProductSpecs[i].SalePrice"></span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No product specs found.</p>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Product Image:</label>
+                        <span class="text-danger" asp-validation-for="ProductImages"></span>
+                        @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
+                        {
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Image</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (var i = 0; i < Model.ProductImages.Count; i++)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <input type="number" asp-for="ProductImages[i].ProductImageId" class="form-control" value="@Model.ProductImages[i].ProductImageId" readonly>
+                                            </td>
+                                            <td>
+                                                <img id="imageSection@(i)" src="@Model.ProductImages[i].ImageUrl" class="d-block w-25" alt="Image">
+                                                <span asp-validation-for="ProductImages[i].ImageUrl" class="text-danger"></span>
+                                            </td>
+                                            <td>
+                                                <input type="file" class="form-control" asp-for="ProductImages[i].ImageFile" onchange="previewImage(@i)" id="imageInput@(i)">
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No product specs found.</p>
+                        } <div id="viewProductImages"></div>
+                    </div>
+                    <input type="hidden" asp-for="ProductStatus" class="form-control" value="@Model.ProductStatus">
+                    @if (Model.ProductImages != null && Model.ProductImages.Count > 0)
+                    {
+                        @for (var i = 0; i < Model.ProductImages.Count; i++)
+                        {
+                            <input type="hidden" asp-for="ProductImages[i].ImageUrl" class="form-control" value="@Model.ProductImages[i].ImageUrl">
+                        }
+                    }
+                    <div class="d-flex">
+                        <button type="button" class="btn btn-primary me-2" style="width: 5%;" onclick="window.location.href = '@Url.Content("~/AdminProduct/ProductList")'">Back</button>
+                        <button type="submit" class="btn btn-warning" style="width: 15%;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function previewImage(index) {
+        var imageInput = document.getElementById("imageInput" + index);
+        var previewImage = document.getElementById("imageSection" + index);
+        var file = imageInput.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using OSS_Main.Hubs;
 using OSS_Main.Models.Entity;
 using OSS_Main.Service.Interface;
 
@@ -12,12 +14,13 @@ namespace OSS_Main.Controllers
         private readonly IUserService _userService;
         private readonly UserManager<AspNetUser> _userManager;
         private readonly IEmailService _emailService;
-
-        public AdminAccountController(IUserService userService, UserManager<AspNetUser> userManager, IEmailService emailService)
+        private readonly IHubContext<AdminHub> _adminHubContext;
+        public AdminAccountController(IUserService userService, UserManager<AspNetUser> userManager, IEmailService emailService, IHubContext<AdminHub> adminHubContext)
         {
             _userService = userService;
             _userManager = userManager;
             _emailService = emailService;
+            _adminHubContext = adminHubContext;
         }
 
         public async Task<IActionResult> AccountList(string searchQuery, string roleFilter, string statusFilter, int page = 1, int pageSize = 10)
@@ -47,7 +50,7 @@ namespace OSS_Main.Controllers
             return View(pagedUsers);
         }
         // Xem chi tiết user
-        public async Task<IActionResult> ViewUser(string id)
+        public async Task<IActionResult> AccountDetail(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -73,71 +76,74 @@ namespace OSS_Main.Controllers
 
         // Thêm user mới
         [HttpPost]
-        public async Task<IActionResult> AddUser(string username, string email, string phoneNumber, DateTime DOB, bool gender, string role)
+        public async Task<IActionResult> AddUser(AspNetUser userInput, string Role)
         {
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(userInput.UserName) || string.IsNullOrWhiteSpace(userInput.Email))
             {
-                return Json(new { success = false, message = "Username, Email, and Password are required." });
+                TempData["Error"] = "Username, Email are required. Try again.";
+                return RedirectToAction("AccountList");
             }
 
-            var existingUser = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByEmailAsync(userInput.Email);
             if (existingUser != null)
             {
-                return Json(new { success = false, message = "User with this email already exists." });
+                TempData["Error"] = "User with this email already exists. Try again.";
+                return RedirectToAction("AccountList");
             }
 
             string password = await _userService.AutoCreatePasswords();
 
             var user = new AspNetUser
             {
-                UserName = email, // fix tạm ở đây hehehehe
-                Email = email,
-                PhoneNumber = phoneNumber,
-                Dob = DOB ,
-                Gender = gender,
+                UserName = userInput.UserName,
+                Email = userInput.Email,
+                PhoneNumber = userInput.PhoneNumber,
+                Dob = userInput.Dob,
+                Gender = userInput.Gender,
             };
             // Cập nhật email đã được xác nhận ngay lập tức
             var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             await _userManager.ConfirmEmailAsync(user, confirmationToken);
             user.LockoutEnabled = false;
 
-            bool result = await _userService.AddUserAsync(user, password, role);
-
+            bool result = await _userService.AddUserAsync(user, password, Role);
 
             if (result)
             {
-                await _emailService.SendWelcomeEmail(email, username, password);
+                await _emailService.SendWelcomeEmail(userInput.Email, userInput.UserName, password);
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
                 return RedirectToAction("AccountList");
             }
             else
             {
-                return Json(new { success = false, message = "Failed to add user." });
+                TempData["Error"] = "Failed to add user.";
+                return RedirectToAction("AccountList");
             }
         }
 
-        // Xóa user
         [HttpPost]
-        public async Task<IActionResult> DeleteUser(string id)
+        public async Task<IActionResult> UpdateUserStatus(string Id, bool LockoutEnabled)
         {
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(Id))
             {
                 return Json(new { success = false, message = "User ID is required." });
             }
 
-            bool result = await _userService.DeleteUserAsync(id);
-
-            if (result)
+            bool success = await _userService.UpdateUserStatus(Id, LockoutEnabled);
+            if (success)
             {
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
                 return RedirectToAction("AccountList");
             }
             else
             {
-                return Json(new { success = false, message = "Failed to delete user. User may not exist." });
+                TempData["Error"] = "User may not exist.";
+                return RedirectToAction("AccountList");
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUser(AspNetUser userInput, List<string> newRoles)
+        public async Task<IActionResult> UpdateUser(AspNetUser userInput, string Role)
         {
             var existingUser = await _userService.GetUserForUpdateByIdAsync(userInput.Id);
             if (existingUser == null)
@@ -155,17 +161,21 @@ namespace OSS_Main.Controllers
             // Gọi hàm update user
             var isUserUpdated = await _userService.UpdateUserAsync(existingUser);
 
-            Console.WriteLine($"[DEBUG] New roles: {string.Join(", ", newRoles)}");
-
             // Cập nhật role dựa trên "existingUser" (cùng 1 instance)
-            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, newRoles);
+            var isRolesUpdated = await _userService.UpdateUserRolesAsync(existingUser, Role);
             if (!isRolesUpdated)
                 return BadRequest("Failed to update user roles.");
 
             if (isUserUpdated)
-                return RedirectToAction("ViewUser", new { id = existingUser.Id });
+            {
+                await _adminHubContext.Clients.All.SendAsync("UpdateAccount");
+                return RedirectToAction("AccountDetail", new { id = existingUser.Id });
+            }
             else
-                return BadRequest(new { success = false, message = "Failed to update user." });
+            {
+                TempData["Error"] = "Failed to update user.";
+                return RedirectToAction("AccountDetail", new { id = existingUser.Id });
+            }
         }
         public IActionResult Index()
         {

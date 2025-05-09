@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
@@ -10,6 +11,7 @@ using System.Text.Json;
 
 namespace OSS_Main.Controllers
 {
+    [Authorize(Roles = "Admin, Sales")]
     public class SaleController : Controller
     {
         private readonly IVnPayProxy _vnPayService;
@@ -164,9 +166,12 @@ namespace OSS_Main.Controllers
                 }
                 else
                 {
-                    order.OrderStatusId = 3; //3 là cancel order
+                    order.OrderStatusId = 6; //6 là cancel order
                     await _orderService.UpdateOrderOnGHNAsync(order);
                     await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+
+                    await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
                     return RedirectToAction("Index");
                 }
 
@@ -187,9 +192,11 @@ namespace OSS_Main.Controllers
                 {
                     return NotFound("Order not found.");
                 }
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
                 await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -208,8 +215,33 @@ namespace OSS_Main.Controllers
                 {
                     return NotFound("Order not found.");
                 }
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "cancel", order);
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> ConfirmReturned(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId.ToString());
+                if (order == null)
+                {
+                    return NotFound("Order not found.");
+                }
+                order.OrderStatusId = 26; //26 là confirm_returned 
+                await _orderService.UpdateOrderOnGHNAsync(order);
+                await _productService.UpdateProductQuantityAfterCancel(order.OrderItemOrders);//Trả lại số lượng
+                await _hubContext.Clients.All.SendAsync("ConfirmOrder", "confirm", order);
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

@@ -1,0 +1,22 @@
+﻿@model OSS_Main.Models.DTO.EntityDTO.ProductSpecDTO
+@{
+    var i = ViewData["Index"] as int? ?? 0;
+}
+    <tr>
+        <td>
+            <input type="text" asp-for="SpecName" class="form-control" value="SpecName">
+            <span class="text-danger" asp-validation-for="SpecName"></span>
+        </td>
+        <td>
+            <input type="number" asp-for="Quantity" class="form-control" value=".Quantity">
+            <span class="text-danger" asp-validation-for="Quantity"></span>
+        </td>
+        <td>
+            <input type="number" asp-for="BasePrice" class="form-control" value="BasePrice">
+            <span class="text-danger" asp-validation-for="BasePrice"></span>
+        </td>
+        <td>
+            <input type="number" asp-for="SalePrice" class="form-control" value="SalePrice">
+            <span class="text-danger" asp-validation-for="SalePrice"></span>
+        </td>
+    </tr>

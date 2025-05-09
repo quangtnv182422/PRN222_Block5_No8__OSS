@@ -123,7 +123,12 @@ namespace OSS_Main.Repository.Implementation
                         CartId = cart.CartId,
                         ProductSpecId = productSpecId,
                         Quantity = quantity,
-                        PriceEachItem = (spec.SalePrice ?? 0) * quantity
+                        PriceEachItem = (spec.SalePrice ?? 0) * quantity,
+                        ProductName = spec.Product.ProductName,
+                        Description = spec.Product.Description,
+                        SpecName = spec.SpecName,
+                        BasePrice = spec.BasePrice,
+                        SalePrice = spec.SalePrice,
                     };
                     _context.CartItems.Add(newItem);
                 }

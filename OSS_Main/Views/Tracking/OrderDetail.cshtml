@@ -1,4 +1,4 @@
-﻿@model OSS_Main.Models.Entity.Order 
+﻿@model OSS_Main.Models.Entity.Order
 
 @{
     ViewData["Title"] = "Order Details";
@@ -29,6 +29,7 @@
                 <th style="padding: 8px; text-align: left;">Price</th>
                 <th style="padding: 8px; text-align: left;">Quantity</th>
                 <th style="padding: 8px; text-align: left;">Total</th>
+                <th style="padding: 8px; text-align: left;"> </th>
             </tr>
         </thead>
         <tbody>
@@ -61,6 +62,43 @@
 
                     <!-- Total Column -->
                     <td style="padding: 8px;">@string.Format("{0:N0}", orderItem.CartItem.PriceEachItem * orderItem.CartItem.Quantity) VND</td>
+
+                    @if (orderItem.FeedbackId == null && Model.OrderStatusId == 3)
+                    {
+                        <!-- Feedback -->
+                        <td style="padding: 8px;">
+                            <form method="get" asp-action="FeedbackForm" asp-controller="Products" class="billing-address-form">
+                                <input type="hidden" name="productId" value="@orderItem.CartItem.ProductSpec.ProductId" />
+                                <input type="hidden" name="orderItemId" value="@orderItem.OrderItemId" />
+                                <button type="submit"
+                                        style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                        onmouseover="this.style.backgroundColor='#138496'"
+                                        onmouseout="this.style.backgroundColor='#c78100'"
+                                        onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                    Write Feedback
+                                </button>
+                            </form>
+                        </td>
+                    }
+                    else if (orderItem.FeedbackId != null && Model.OrderStatusId == 3)
+                    {
+                        <td style="padding: 8px;">
+                            <form method="get" asp-action="Details" asp-controller="Products" class="billing-address-form">
+                                <input type="hidden" name="productId" value="@orderItem.CartItem.ProductSpec.ProductId" />
+
+                                <button type="submit"
+                                        style="padding: 12px 24px; background-color: #c78100; color: white; border: none; cursor: pointer; border-radius: 8px; font-size: 16px; transition: background-color 0.3s, transform 0.2s;"
+                                        onmouseover="this.style.backgroundColor='#138496'"
+                                        onmouseout="this.style.backgroundColor='#c78100'"
+                                        onclick="this.style.transform='scale(1.1)'; setTimeout(()=>this.style.transform='scale(1)', 150)">
+                                    View Feedback
+                                </button>
+                            </form>
+                        </td>
+
+                    }
+
+
                 </tr>
             }
         </tbody>
@@ -71,7 +109,7 @@
 
 <!-- Order Total Section -->
 <div class="order-details" style="font-size: 16px; color: #333; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
-   
+
     <div class="row" style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold;">
         <div class="col">TOTAL</div>
         <div class="col text-right">@string.Format("{0:N0}", Model.TotalCost) VND</div>

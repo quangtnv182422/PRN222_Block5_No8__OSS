@@ -88,7 +88,7 @@ namespace OSS_Main.Areas.Identity.Pages.Account
             [Display(Name = "Gender")]
             public bool Gender { get; set; } // Giới tính: True cho Nam, False cho Nữ
 
-            public string Role { get; set; } = "customer";
+            public string Role { get; set; } = "Customer";
         }
 
         public async Task OnGetAsync(string returnUrl = null)

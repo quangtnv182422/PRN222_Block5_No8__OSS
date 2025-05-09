@@ -1,7 +1,5 @@
-﻿using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.EntityFrameworkCore;
 using OSS_Main.Models.Entity;
 using OSS_Main.Repository.Interface;
 using OSS_Main.Service.Interface;
@@ -10,7 +8,6 @@ namespace OSS_Main.Service.Implementation
 {
     public class OrderService : IOrderService
     {
-
         private readonly IOrderRepo _orderRepo;
         private readonly ICartService _cartService;
         private readonly IEmailSender _emailSender;
@@ -33,7 +30,7 @@ namespace OSS_Main.Service.Implementation
                                                   float totalCost,
                                                   int orderStatus,
                                                   string? note,
-                                                  int receiverId,  
+                                                  int receiverId,
                                                   string orderId_GHN)
         {
             var cartItems = await _cartService.GetCartItemsByIdsAsync(cartItemIds);
@@ -53,7 +50,7 @@ namespace OSS_Main.Service.Implementation
                 OrderStatusId = orderStatus,
                 OrderItemOrders = cartItems.Select(ci => new OrderItem
                 {
-                    CartItemId = ci.CartItemId, 
+                    CartItemId = ci.CartItemId,
                     CartItem = ci
                 }).ToList(),
                 TotalCost = (decimal)totalCost,
@@ -66,20 +63,20 @@ namespace OSS_Main.Service.Implementation
                 item.CartId = null;
                 await _cartService.UpdateCartItemAsync(item);
             }
-            
+
             // Gửi email xác nhận (nếu cần)
             var receiverInfor = await _receiverService.GetDefaultReceiverInfoByIdAsync(receiverId);
             string fullAddress = $"{receiverInfor.Address}, {receiverInfor.WardName_GHN}, {receiverInfor.DistrictName_GHN}, {receiverInfor.ProvinceName_GHN}";
-            string link = "https://localhost:7012/Products/Index";
+            string link = "https://localhost:7012/Products/Index";//fix cứng tạm thời
             var user = _httpContextAccessor.HttpContext?.User;
             var email = user != null ? (await _userManager.GetUserAsync(user))?.Email : null;
 
 
             await SendOrderConfirmEmail(email, receiverInfor.FullName, fullAddress, receiverInfor.PhoneNumber, note, cartItems.Select(ci => new OrderItem
-             {
-                 CartItemId = ci.CartItemId,
-                 CartItem = ci
-             }).ToList(), link, paymentMethod);
+            {
+                CartItemId = ci.CartItemId,
+                CartItem = ci
+            }).ToList(), link, paymentMethod);
 
             return order;
         }
@@ -204,7 +201,7 @@ namespace OSS_Main.Service.Implementation
 
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
-           return await _orderRepo.GetOrderByIdAsync(orderId);
+            return await _orderRepo.GetOrderByIdAsync(orderId);
         }
 
         public async Task<List<Order>> GetOrderByCustomerIdAsync(string customerId)
@@ -215,5 +212,46 @@ namespace OSS_Main.Service.Implementation
         {
             return await _orderRepo.GetAllOrderAsync();
         }
+
+        public async Task<List<Order>> GetAllOrderShippingAsync()
+        {
+            return await _orderRepo.GetAllOrderShippingAsync();
+        }
+        public async Task<OrderStatus> GetOrderStatusByNameAsync(string orderStatusName)
+        {
+            return await _orderRepo.GetOrderStatusByNameAsync(orderStatusName);
+        }
+        public async Task<List<Order>> GetAllOrderByUserReceiverAsync(string userId)
+        {
+            return await _orderRepo.GetAllOrderByUserReceiverAsync(userId);
+        }
+        public async Task<List<OrderStatus>> GetAllOrderStatusAsync()
+        {
+            return await _orderRepo.GetAllOrderStatusAsync();
+
+        }
+        public async Task<decimal> GetTotalCostsAsync() => await _orderRepo.GetTotalCostsAsync();
+
+        public async Task<List<decimal>> GetTotalCostsByMonthAsync(int year)
+        {
+            var result = await _orderRepo.GetTotalCostsByMonthAsync(year);
+
+            List<decimal> revenueOfAllMonths = new List<decimal>();
+            //Map doanh thu với từng tháng vì có thể có tháng doanh thu bằng 0
+            for (int i = 1; i <= 12; i++)
+            {
+                if (result.TryGetValue(i, out decimal revenue))
+                {
+                    revenueOfAllMonths.Add(revenue);
+                }
+                else
+                {
+                    revenueOfAllMonths.Add(0); //tháng này doanh thu của web là 0 đồng
+                }
+            }
+            return revenueOfAllMonths;
+        }
+
+        public async Task<List<int>> GetAllOrderYearsAsync() => await _orderRepo.GetAllOrderYearsAsync();
     }
 }

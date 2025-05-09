@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Net.payOS.Types;
+using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
 using OSS_Main.Models.DTO.Vnpay;
 using OSS_Main.Models.Entity;
@@ -14,7 +17,7 @@ using System.Text.Json;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Customer")]
     public class PaymentController : Controller
     {
         //	9704198526191432198
@@ -28,7 +31,7 @@ namespace OSS_Main.Controllers
         private readonly IGhnProxy _ghnService;
         private readonly IProductService _productService;
         private readonly IReceiveInforService _receiverService;
-
+        private readonly IHubContext<OrderHub> _hubContext;
 
 
         public PaymentController(IVnPayProxy vnPayService,
@@ -38,7 +41,8 @@ namespace OSS_Main.Controllers
                                 IConfiguration configuration,
                                 IUserService userService,
                                 IGhnProxy ghnService,
-                                IReceiveInforService receiverService
+                                IReceiveInforService receiverService,
+                                IHubContext<OrderHub> hubContext
                               )
         {
             _vnPayService = vnPayService;
@@ -49,6 +53,7 @@ namespace OSS_Main.Controllers
             _userService = userService;
             _ghnService = ghnService;
             _receiverService = receiverService;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -72,7 +77,7 @@ namespace OSS_Main.Controllers
 
             //Tạo order lưu vào DB với trạng thái pending
             var order = await _orderService.CreateOrderAsync(userId, paymentMethod, cartItemIds,
-                                                (float)totalCost, 1, deliveryNotes, receiverInforId, null); // 1 là pending confirm dành cho COD
+                                                (float)totalCost, 1, deliveryNotes, receiverInforId, null); // 1 là waiting_confirmation dành cho COD
 
             // DTO để lưu thông tin order được gửi qua GHN
             var shippingOrder = new ShippingOrder
@@ -104,33 +109,19 @@ namespace OSS_Main.Controllers
                                     name = "Hoa Quả",
                                     quantity = cartItemIds.Count,
                                     weight = 1200,
-                                    category = new ShippingOrder.ItemOrderGHN.CategoryGHN { level1 = "Sách" }
+                                    category = new ShippingOrder.ItemOrderGHN.CategoryGHN { level1 = "Quả" }
                                 }
                             }
             };
             // Lưu thông tin shippingOrder vào TempData
             TempData["ShippingOrder"] = JsonSerializer.Serialize(shippingOrder);
+            //cập nhật luôn order sang kia
+            await _hubContext.Clients.All.SendAsync("NewOrder");
 
 
             switch (paymentMethod)
             {
                 case "COD":
-                    //COD thì chưa vội gửi order shipping sang cho GHN
-                   
-                  /*  var shippingResponse = await _ghnService.SendShippingOrderAsync(shippingOrder);
-                    if (shippingResponse.Contains("Error"))
-                    {
-                        return BadRequest("Failed to create shipping order: " + shippingResponse);
-                    }
-                    else
-                    {
-                        //Gán OrderId củ GHN vào DB
-                        var json = JsonDocument.Parse(shippingResponse);
-                        string orderCode = json.RootElement.GetProperty("data").GetProperty("order_code").GetString();
-                        order.OrderCode_GHN = orderCode;
-                        await _orderService.UpdateOrderOnGHNAsync(order);
-                    }*/
-
 
                     return RedirectToAction("PaymentSuccess");
 
@@ -168,7 +159,7 @@ namespace OSS_Main.Controllers
         /// Xử lý thanh toán từ form payment again
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> ProcessPaymentAgain( int orderId,
+        public async Task<IActionResult> ProcessPaymentAgain(int orderId,
                                                         string paymentMethod,
                                                         int receiverInforId)
         {
@@ -177,7 +168,7 @@ namespace OSS_Main.Controllers
             string fullAddress = $"{receiverInfor.Address}, {receiverInfor.WardName_GHN}, {receiverInfor.DistrictName_GHN}, {receiverInfor.ProvinceName_GHN}";
 
             //Tìm theo OrderId
-            var order = await _orderService.GetOrderByIdAsync(orderId.ToString()); 
+            var order = await _orderService.GetOrderByIdAsync(orderId.ToString());
 
             // DTO để lưu thông tin order được gửi qua GHN
             var shippingOrder = new ShippingOrder
@@ -296,7 +287,7 @@ namespace OSS_Main.Controllers
                 var updateOrder = await _orderService.GetOrderByIdAsync(response.OrderId);
                 if (updateOrder != null)
                 {
-                    updateOrder.OrderStatusId = 2;
+                    updateOrder.OrderStatusId = 2; //orderstatus là confirmed_order
                     updateOrder.PaymentMethod = "vnPay";
                     await _orderService.UpdateOrderOnGHNAsync(updateOrder);
 
@@ -332,6 +323,8 @@ namespace OSS_Main.Controllers
             {
                 TempData["Message"] = "Lỗi xác nhận đơn hàng: Không thể chuyển đổi OrderId.";
             }
+            await _hubContext.Clients.All.SendAsync("NewOrder");
+
             return RedirectToAction("PaymentSuccess");
         }
 
@@ -364,7 +357,7 @@ namespace OSS_Main.Controllers
                 var updateOrder = await _orderService.GetOrderByIdAsync(orderId);
                 if (updateOrder != null)
                 {
-                    updateOrder.OrderStatusId = 2;
+                    updateOrder.OrderStatusId = 2; // orderstatus là confirmed_order
                     updateOrder.PaymentMethod = "PayOS";
                     await _orderService.UpdateOrderOnGHNAsync(updateOrder);
 
@@ -393,6 +386,7 @@ namespace OSS_Main.Controllers
                     }
 
                 }
+                await _hubContext.Clients.All.SendAsync("NewOrder");
                 return RedirectToAction("PaymentSuccess");
 
             }

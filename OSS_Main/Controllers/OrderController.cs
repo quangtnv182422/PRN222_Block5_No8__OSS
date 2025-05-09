@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using OSS_Main.Hubs;
 using OSS_Main.Models.DTO.GHN;
 using OSS_Main.Models.Entity;
 using OSS_Main.Proxy.GHN;
@@ -12,7 +14,7 @@ using System.Security.Claims;
 
 namespace OSS_Main.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Customer")]
     public class OrderController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -22,7 +24,8 @@ namespace OSS_Main.Controllers
         private readonly IProductService _productService;
         private readonly IGhnProxy _ghnService;
         private readonly IReceiveInforService _receiveInforService;
-        private readonly Prn222ProjectContext _context;
+        private readonly Prn222ProjectContext _context; // chỗ này bị lười cập nhật ở service:)))
+        private readonly IHubContext<OrderHub> _hubContext;
         public OrderController(ICartService cartService, 
                                             IOrderService orderService,
                                             IUserService userService, 
@@ -30,7 +33,8 @@ namespace OSS_Main.Controllers
                                             IGhnProxy ghnService, 
                                             IConfiguration configuration,
                                             IReceiveInforService receiveInforService,
-                                            Prn222ProjectContext context)
+                                            Prn222ProjectContext context,
+                                            IHubContext<OrderHub> hubContext)
         {
             _cartService = cartService;
             _orderService = orderService;
@@ -40,6 +44,7 @@ namespace OSS_Main.Controllers
             _configuration = configuration;
             _receiveInforService = receiveInforService;
             _context = context;
+            _hubContext = hubContext;
         }
 
         [HttpGet]
@@ -247,8 +252,32 @@ namespace OSS_Main.Controllers
                     return NotFound("Order not found.");
                 }
 
-                order.OrderStatusId = 3; //3 là cancel order
+                order.OrderStatusId = 6; //6 là cancel order
                 await _orderService.UpdateOrderOnGHNAsync(order);
+                await _hubContext.Clients.All.SendAsync("NewOrder");
+                return RedirectToAction("Index", "Tracking");
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmReceived(int orderId)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(orderId.ToString());
+                if (order == null)
+                {
+                    return NotFound("Order not found.");
+                }
+
+                order.OrderStatusId = 3; //3 là confirm_received
+                await _orderService.UpdateOrderOnGHNAsync(order);
+                await _hubContext.Clients.All.SendAsync("NewOrder");
                 return RedirectToAction("Index", "Tracking");
             }
             catch (Exception ex)

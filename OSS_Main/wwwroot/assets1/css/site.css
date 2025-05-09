@@ -1,0 +1,84 @@
+﻿nav div {
+    font-size: 20px;
+}
+
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .8s ease-out, visibility 0s linear .5s;
+    z-index: 99999;
+}
+
+    #spinner.show {
+        transition: opacity .8s ease-out, visibility 0s linear .0s;
+        visibility: visible;
+        opacity: 1;
+    }
+
+.pagination a {
+    color: var(--bs-dark);
+    padding: 10px 16px;
+    text-decoration: none;
+    transition: 0.5s;
+    border: 1px solid var(--bs-secondary);
+}
+
+    .pagination a.active {
+        background-color: var(--bs-primary);
+        color: var(--bs-light);
+        border: 1px solid var(--bs-secondary);
+    }
+
+    .pagination a:hover:not(.active) {
+        background-color: var(--bs-primary)
+    }
+
+.btn-soft-primary {
+    background-color: rgba(57,108,240,0.1) !important;
+    border: 1px solid rgba(57,108,240,0.1) !important;
+    color: #396cf0 !important;
+    box-shadow: 0 3px 5px 0 rgba(57,108,240,0.3)
+}
+
+    .btn-soft-primary:hover, .btn-soft-primary:focus, .btn-soft-primary:active, .btn-soft-primary.active, .btn-soft-primary.focus {
+        background-color: #396cf0 !important;
+        border-color: #396cf0 !important;
+        color: #fff !important
+    }
+
+.btn-soft-success {
+    background-color: rgba(83,199,151,0.1) !important;
+    border: 1px solid rgba(83,199,151,0.1) !important;
+    color: #53c797 !important;
+    box-shadow: 0 3px 5px 0 rgba(83,199,151,0.3)
+}
+
+    .btn-soft-success:hover, .btn-soft-success:focus, .btn-soft-success:active, .btn-soft-success.active, .btn-soft-success.focus {
+        background-color: #53c797 !important;
+        border-color: #53c797 !important;
+        color: #fff !important
+    }
+
+.btn-soft-danger {
+    background-color: rgba(240,115,90,0.1) !important;
+    border: 1px solid rgba(240,115,90,0.1) !important;
+    color: #f0735a !important;
+    box-shadow: 0 3px 5px 0 rgba(240,115,90,0.3)
+}
+
+    .btn-soft-danger:hover, .btn-soft-danger:focus, .btn-soft-danger:active, .btn-soft-danger.active, .btn-soft-danger.focus {
+        background-color: #f0735a !important;
+        border-color: #f0735a !important;
+        color: #fff !important
+    }
+
+.btn.btn-icon {
+    height: 36px;
+    width: 36px;
+    line-height: 34px;
+    padding: 0
+}
+
+.btn-pills {
+    border-radius: 50%;
+}
