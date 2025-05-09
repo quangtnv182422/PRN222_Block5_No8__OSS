@@ -114,11 +114,7 @@ public class GeminiService
                 - *Tích hợp GHN*: Hỗ trợ tra cứu trạng thái đơn hàng theo mã vận đơn.
                 Người dùng có thể đặt hàng, hủy đơn, trả hàng.
                 
-                Có 3 phương thức thanh toán là Thanh toán bằng mã QR, Thanh toán bằng vnPay, và COD
-
-                Dữ liệu này sẽ hỗ trợ các câu hỏi của người dùng về sản phẩm, tình trạng đơn hàng,
-                và thông tin chi tiết về các mặt hàng bán trên website của bạn và ngoài các dữ liệu này có thể trả lời dùng dữ liệu ngoài để trả lời hoặc dùng các kiến thức chung trên mạng để đáp ứng các loại câu hỏi.
-                                        "
+                Có 3 phương thức thanh toán là Thanh toán bằng mã QR, Thanh toán bằng vnPay, và COD "
         ;
 
         var currentUserId = await _userService.GetUserIdAsync(httpContext);
@@ -194,15 +190,13 @@ public class GeminiService
             if (roles.Contains("Admin"))
             {
                 internalIdentity = $@"
-                    Đây là
-                    Thông tin hệ thống sau khi đã đăng nhập người dùng với vai trò là Admin :
-                Website bán hoa quả tên là Fruitable.
+                   
+                    Đây là thông tin hệ thống sau khi đã đăng nhập người dùng với vai trò (role) là Admin (Admin) của hệ thống :
 
                  - Đây là thông tin người dùng đang đăng nhập:
                     - Tên người dùng: {currentUser.UserName}
                     - Email: {currentUser.Email}
                     - Phone: {currentUser.PhoneNumber}
-            
                                 ";
 
 
@@ -227,10 +221,13 @@ public class GeminiService
                 var orderTracking = await _orderService.GetAllOrderAsync();
                 if (orderTracking != null)
                 {
+                    internalIdentity += $@"
+                                        hiện trong hệ thống đang có tất cả {orderTracking.Count()} đơn hàng (order) và Đây là các order của người dùng và :";
+
                     foreach (var item in orderTracking)
                     {
                         internalIdentity += $@"
-                                        Đây là các order của người dùng:
+                                -------------------------------------------------------------------------------
                                       -  Order Id : {item.OrderId}
                                       -  Order Code bên Giao Hàng Nhanh (GHN) : {item.OrderCode_GHN}
                                       -  Order được tạo lúc : {item.OrderAt}
@@ -247,11 +244,11 @@ public class GeminiService
                 var userList = await _userService.GetAllUsersAsync();
                 if (userList != null)
                 {
-                    internalIdentity = $@"Tổng tất cả {userList.Count()} tài khoản trong hệ thống";
+                    internalIdentity += $@"Hiện tại tổng có tất cả {userList.Count()} tài khoản trong hệ thống  và Đây là các thông tin cá nhân của người dùng:";
                     foreach (var item in userList)
                     {
                         internalIdentity += $@"
-                                        Đây là các thông tin cá nhân của người dùng:
+                                        
 
                                       -  User Name  : {item.UserName}
                                       -  Email : {item.Email}

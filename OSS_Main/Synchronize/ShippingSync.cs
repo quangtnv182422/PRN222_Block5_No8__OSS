@@ -29,7 +29,7 @@ namespace OSS_Main.Synchronize
                 // Gọi xử lý logic cập nhật GHN
                 await SyncOrdersWithGHN();
 
-                await Task.Delay(3000, stoppingToken);
+                await Task.Delay(1000, stoppingToken);
             }
         }
 
